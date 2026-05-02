@@ -180,7 +180,7 @@ const Dashboard = () => {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold">Programma di oggi</h2>
-          <span className="text-xs text-muted-foreground tabular-nums">Ora: {currentTimeStr}</span>
+          <span className="text-muted-foreground tabular-nums text-base">Ora: {currentTimeStr}</span>
         </div>
 
         {loading ? (
