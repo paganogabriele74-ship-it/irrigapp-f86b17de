@@ -50,9 +50,6 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
               <Plus className="size-4" />
               Nuovo
             </Button>
-            <Button variant="ghost" size="icon" onClick={signOut} title={`Esci (${profile?.full_name ?? ""})`}>
-              <LogOut className="size-4" />
-            </Button>
           </div>
         </div>
       </header>
