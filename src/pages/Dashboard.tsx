@@ -159,7 +159,7 @@ const Dashboard = () => {
       )}
 
       {/* Stats */}
-      <section className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+      <section className="grid grid-cols-2 gap-3 mb-6">
         <Card className="p-4">
           <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
             <CalendarClock className="size-4" /> OGGI
@@ -168,22 +168,6 @@ const Dashboard = () => {
           <div className="text-xs text-muted-foreground">irrigazioni</div>
         </Card>
         <Card className="p-4">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <Sparkles className="size-4" /> PROSSIMA
-          </div>
-          {nextSlot ? (
-            <>
-              <div className="text-2xl font-bold tabular-nums">{formatTime(nextSlot.time)}</div>
-              <div className="text-xs text-muted-foreground truncate">{nextSlot.dayLabel} · {nextSlot.program.name}</div>
-            </>
-          ) : (
-            <>
-              <div className="text-2xl font-bold">—</div>
-              <div className="text-xs text-muted-foreground">nessuna in arrivo</div>
-            </>
-          )}
-        </Card>
-        <Card className="p-4 col-span-2 sm:col-span-1">
           <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
             <ListTree className="size-4" /> ATTIVI
           </div>
