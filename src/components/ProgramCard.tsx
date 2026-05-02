@@ -45,7 +45,7 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
                 Settori <span className="text-foreground font-medium">{formatSectors(program.sectors)}</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <Timer className="size-3.5" />
+                <AlarmClock className="size-3.5" />
                 <span className="text-foreground font-medium">{program.duration_minutes} min</span>
               </span>
             </div>
