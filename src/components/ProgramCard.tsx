@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Clock, Droplets, Layers, Timer } from "lucide-react";
+import { AlarmClock, Clock, Droplets, Layers, Timer } from "lucide-react";
 import { DOSAGE_COLORS, DOSAGE_LABELS, formatSectors, formatTime, Program } from "@/lib/irrigation";
 import { SignedImage } from "./SignedImage";
 import { Link } from "react-router-dom";
