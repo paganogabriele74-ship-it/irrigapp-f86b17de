@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Clock, Droplets, Layers, Timer } from "lucide-react";
+import { AlarmClock, Clock, Droplets, Layers, Timer } from "lucide-react";
 import { DOSAGE_COLORS, DOSAGE_LABELS, formatSectors, formatTime, Program } from "@/lib/irrigation";
 import { SignedImage } from "./SignedImage";
 import { Link } from "react-router-dom";
@@ -45,7 +45,7 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
                 Settori <span className="text-foreground font-medium">{formatSectors(program.sectors)}</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <Timer className="size-3.5" />
+                <AlarmClock className="size-3.5" />
                 <span className="text-foreground font-medium">{program.duration_minutes} min</span>
               </span>
             </div>
