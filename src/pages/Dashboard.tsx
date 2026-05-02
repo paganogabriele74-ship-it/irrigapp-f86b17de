@@ -7,7 +7,7 @@ import { ProgramCard } from "@/components/ProgramCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarClock, Sparkles, Plus, ListTree } from "lucide-react";
+import { CalendarClock, Sparkles, Plus, ListTree, Timer } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program } from "@/lib/irrigation";
 
 interface Slot {
@@ -19,6 +19,7 @@ const Dashboard = () => {
   const { profile } = useAuth();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     (async () => {
@@ -29,6 +30,11 @@ const Dashboard = () => {
       setPrograms((data ?? []) as unknown as Program[]);
       setLoading(false);
     })();
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
   }, []);
 
   const today = jsDayToAppDay(new Date().getDay());
@@ -43,7 +49,6 @@ const Dashboard = () => {
   todaySlots.sort((a, b) => a.time.localeCompare(b.time));
 
   // Next upcoming
-  const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const toMin = (t: string) => {
     const [h, m] = t.split(":").map(Number);
@@ -74,6 +79,29 @@ const Dashboard = () => {
   const currentTimeStr = formatTime(`${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:00`);
   const upcomingTodayHighlight = todaySlots.find(s => toMin(s.time) > nowMinutes)?.time.slice(0, 5);
 
+  // Compute next slot Date for countdown
+  let nextSlotDate: Date | null = null;
+  if (nextSlot) {
+    const [h, m, s] = nextSlot.time.split(":").map(Number);
+    const offsetDays = (nextSlot.day - today + 7) % 7;
+    const target = new Date(now);
+    target.setHours(h, m, s || 0, 0);
+    if (offsetDays === 0 && target.getTime() <= now.getTime()) {
+      target.setDate(target.getDate() + 7);
+    } else {
+      target.setDate(target.getDate() + offsetDays);
+    }
+    nextSlotDate = target;
+  }
+
+  const diffMs = nextSlotDate ? nextSlotDate.getTime() - now.getTime() : 0;
+  const totalSec = Math.max(0, Math.floor(diffMs / 1000));
+  const cdDays = Math.floor(totalSec / 86400);
+  const cdH = Math.floor((totalSec % 86400) / 3600);
+  const cdM = Math.floor((totalSec % 3600) / 60);
+  const cdS = totalSec % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+
   return (
     <AppShell>
       <section className="mb-6">
@@ -88,6 +116,47 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
+
+      {/* Countdown to next irrigation */}
+      {nextSlot && nextSlotDate && (
+        <section className="mb-6">
+          <Card className="p-5 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
+                <Timer className="size-4" /> PROSSIMA IRRIGAZIONE
+              </div>
+              <div className="text-xs text-muted-foreground truncate text-right">
+                {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
+              </div>
+            </div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="font-semibold truncate">{nextSlot.program.name}</div>
+              <div className="flex items-center gap-1.5 tabular-nums">
+                {cdDays > 0 && (
+                  <div className="flex flex-col items-center">
+                    <span className="text-xl sm:text-2xl font-bold leading-none">{cdDays}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">g</span>
+                  </div>
+                )}
+                <div className="flex flex-col items-center">
+                  <span className="text-xl sm:text-2xl font-bold leading-none">{pad(cdH)}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase">h</span>
+                </div>
+                <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-xl sm:text-2xl font-bold leading-none">{pad(cdM)}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase">m</span>
+                </div>
+                <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-xl sm:text-2xl font-bold leading-none text-primary">{pad(cdS)}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase">s</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </section>
+      )}
 
       {/* Stats */}
       <section className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
