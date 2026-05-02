@@ -63,7 +63,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
 
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/60 pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-4 max-w-md mx-auto">
+        <div className="grid grid-cols-3 max-w-md mx-auto">
           {navItems.map((item) => {
             const active = location.pathname === item.to;
             return (
@@ -80,16 +80,6 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
               </Link>
             );
           })}
-          <Link
-            to="/programmi/nuovo"
-            className={cn(
-              "flex flex-col items-center gap-1 py-2.5",
-              location.pathname === "/programmi/nuovo" ? "text-primary" : "text-muted-foreground"
-            )}
-          >
-            <Plus className="size-5" />
-            <span className="text-[11px] font-medium">Nuovo</span>
-          </Link>
         </div>
       </nav>
     </div>
