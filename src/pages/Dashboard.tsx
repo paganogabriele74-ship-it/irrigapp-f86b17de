@@ -131,7 +131,7 @@ const Dashboard = () => {
             </div>
             <div className="flex items-end justify-between gap-3">
               <div className="font-semibold truncate text-3xl">{nextSlot.program.name}</div>
-              <div className="flex items-center gap-1.5 tabular-nums text-xs font-mono">
+              <div className="flex items-center gap-1.5 tabular-nums font-mono text-sm">
                 {cdDays > 0 && (
                   <div className="flex flex-col items-center">
                     <span className="sm:text-2xl font-bold leading-none text-6xl text-primary">{cdDays}</span>
