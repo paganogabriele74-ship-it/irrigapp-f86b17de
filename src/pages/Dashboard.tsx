@@ -122,35 +122,35 @@ const Dashboard = () => {
         <section className="mb-6">
           <Card className="p-5 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
             <div className="flex items-center justify-between gap-4 mb-3">
-              <div className="flex items-center gap-2 text-muted-foreground font-extrabold text-lg">
+              <div className="flex items-center gap-2 text-muted-foreground font-extrabold text-base">
                 <Timer className="size-4" /> PROSSIMA IRRIGAZIONE
               </div>
-              <div className="text-muted-foreground truncate text-right text-lg">
+              <div className="text-muted-foreground truncate text-right text-xs">
                 {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
               </div>
             </div>
             <div className="flex items-end justify-between gap-3">
-              <div className="font-semibold truncate text-3xl">{nextSlot.program.name}</div>
+              <div className="font-semibold truncate text-base">{nextSlot.program.name}</div>
               <div className="flex items-center gap-1.5 tabular-nums font-mono text-sm">
                 {cdDays > 0 && (
                   <div className="flex flex-col items-center">
-                    <span className="sm:text-2xl font-bold leading-none text-6xl text-primary">{cdDays}</span>
-                    <span className="text-muted-foreground uppercase text-base">g</span>
+                    <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{cdDays}</span>
+                    <span className="text-muted-foreground uppercase text-sm">g</span>
                   </div>
                 )}
                 <div className="flex flex-col items-center">
-                  <span className="sm:text-2xl font-bold leading-none text-6xl text-primary">{pad(cdH)}</span>
-                  <span className="text-muted-foreground uppercase text-base">h</span>
+                  <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{pad(cdH)}</span>
+                  <span className="text-muted-foreground uppercase text-sm">h</span>
                 </div>
                 <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
                 <div className="flex flex-col items-center">
-                  <span className="sm:text-2xl font-bold leading-none text-6xl text-primary">{pad(cdM)}</span>
-                  <span className="text-muted-foreground uppercase text-base">m</span>
+                  <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{pad(cdM)}</span>
+                  <span className="text-muted-foreground uppercase text-sm">m</span>
                 </div>
                 <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
                 <div className="flex flex-col items-center">
-                  <span className="sm:text-2xl font-bold leading-none text-primary text-6xl">{pad(cdS)}</span>
-                  <span className="text-muted-foreground uppercase text-base">s</span>
+                  <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{pad(cdS)}</span>
+                  <span className="text-muted-foreground uppercase text-sm">s</span>
                 </div>
               </div>
             </div>
@@ -180,7 +180,7 @@ const Dashboard = () => {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold">Programma di oggi</h2>
-          <span className="text-xs text-muted-foreground tabular-nums">Ora: {currentTimeStr}</span>
+          <span className="text-muted-foreground tabular-nums text-base">Ora: {currentTimeStr}</span>
         </div>
 
         {loading ? (
