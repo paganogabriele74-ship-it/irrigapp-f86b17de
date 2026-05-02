@@ -100,13 +100,11 @@ const ProgramForm = () => {
     if (times.length === 0) return toast.error("Aggiungi almeno un orario");
 
     setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setSaving(false); return; }
 
     let finalImagePath = imagePath;
     if (imageFile) {
       const ext = imageFile.name.split(".").pop() || "jpg";
-      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const path = `public/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage.from("program-images").upload(path, imageFile, { upsert: false });
       if (upErr) {
         toast.error("Errore upload immagine");
@@ -119,7 +117,6 @@ const ProgramForm = () => {
     }
 
     const payload = {
-      user_id: user.id,
       name: parsed.data.name,
       dosage,
       duration_minutes: parsed.data.duration,

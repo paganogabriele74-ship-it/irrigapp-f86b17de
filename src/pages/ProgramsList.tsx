@@ -42,10 +42,7 @@ const ProgramsList = () => {
   };
 
   const duplicate = async (p: Program) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
     const { data: newP, error } = await supabase.from("programs").insert({
-      user_id: user.id,
       name: `${p.name} (copia)`,
       dosage: p.dosage,
       duration_minutes: p.duration_minutes,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+
 import { AppShell } from "@/components/AppShell";
 import { ProgramCard } from "@/components/ProgramCard";
 import { Card } from "@/components/ui/card";
@@ -16,7 +16,6 @@ interface Slot {
 }
 
 const Dashboard = () => {
-  const { profile } = useAuth();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => new Date());
@@ -110,7 +109,7 @@ const Dashboard = () => {
           <div className="relative">
             <p className="text-sm uppercase tracking-wider opacity-80 mb-1">{todayLabel}</p>
             <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
-              Ciao, {profile?.full_name?.split(" ")[0] ?? "amico"}.
+              Benvenuto su IrrigApp.
             </h1>
             <p className="text-base sm:text-lg opacity-95 mt-1">Ecco cosa abbiamo in programma oggi! 🌱</p>
           </div>

@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Sprout, LayoutDashboard, ListTree, Plus, LogOut, CalendarDays } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { Sprout, LayoutDashboard, ListTree, Plus, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +12,6 @@ const navItems = [
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-0">
@@ -51,9 +49,6 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
             <Button size="sm" onClick={() => navigate("/programmi/nuovo")} className="hidden sm:inline-flex">
               <Plus className="size-4" />
               Nuovo
-            </Button>
-            <Button variant="ghost" size="icon" onClick={signOut} title={`Esci (${profile?.full_name ?? ""})`}>
-              <LogOut className="size-4" />
             </Button>
           </div>
         </div>
