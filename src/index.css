@@ -2,104 +2,134 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* IrrigApp Design System — Verde natura, fresco e pulito.
+   Tutti i colori in HSL. */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 90 30% 98%;
+    --foreground: 150 30% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 150 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 150 30% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Foglia profonda */
+    --primary: 145 55% 32%;
+    --primary-foreground: 90 30% 98%;
+    --primary-glow: 142 65% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Verde salvia chiaro */
+    --secondary: 130 35% 92%;
+    --secondary-foreground: 150 35% 18%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 100 20% 94%;
+    --muted-foreground: 150 12% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Acqua fresca */
+    --accent: 190 75% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Dosaggio: acqua / concime / acido */
+    --water: 200 80% 50%;
+    --water-foreground: 0 0% 100%;
+    --fertilizer: 30 85% 50%;
+    --fertilizer-foreground: 0 0% 100%;
+    --acid: 350 70% 52%;
+    --acid-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    --border: 130 20% 88%;
+    --input: 130 20% 88%;
+    --ring: 145 55% 32%;
 
-    --sidebar-background: 0 0% 98%;
+    --radius: 0.875rem;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(145 55% 32%), hsl(160 60% 42%));
+    --gradient-fresh: linear-gradient(135deg, hsl(145 55% 32%) 0%, hsl(190 75% 45%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(90 40% 97%) 0%, hsl(130 35% 94%) 100%);
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Shadows */
+    --shadow-soft: 0 2px 12px -4px hsl(145 40% 25% / 0.08);
+    --shadow-elevated: 0 12px 32px -12px hsl(145 50% 25% / 0.18);
+    --shadow-glow: 0 0 24px hsl(142 65% 45% / 0.25);
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 90 30% 98%;
+    --sidebar-foreground: 150 30% 18%;
+    --sidebar-primary: 145 55% 32%;
+    --sidebar-primary-foreground: 90 30% 98%;
+    --sidebar-accent: 130 35% 92%;
+    --sidebar-accent-foreground: 150 35% 18%;
+    --sidebar-border: 130 20% 88%;
+    --sidebar-ring: 145 55% 32%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 150 25% 8%;
+    --foreground: 90 20% 95%;
+    --card: 150 25% 11%;
+    --card-foreground: 90 20% 95%;
+    --popover: 150 25% 11%;
+    --popover-foreground: 90 20% 95%;
+    --primary: 142 60% 50%;
+    --primary-foreground: 150 30% 10%;
+    --primary-glow: 142 70% 60%;
+    --secondary: 150 20% 18%;
+    --secondary-foreground: 90 20% 95%;
+    --muted: 150 18% 16%;
+    --muted-foreground: 150 10% 65%;
+    --accent: 190 70% 55%;
+    --accent-foreground: 150 30% 10%;
+    --water: 200 80% 60%;
+    --water-foreground: 0 0% 100%;
+    --fertilizer: 30 85% 60%;
+    --fertilizer-foreground: 0 0% 10%;
+    --acid: 350 70% 60%;
+    --acid-foreground: 0 0% 100%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 18% 20%;
+    --input: 150 18% 20%;
+    --ring: 142 60% 50%;
+    --gradient-primary: linear-gradient(135deg, hsl(142 60% 40%), hsl(160 65% 45%));
+    --gradient-fresh: linear-gradient(135deg, hsl(142 60% 40%) 0%, hsl(190 70% 50%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(150 25% 10%) 0%, hsl(150 22% 14%) 100%);
+    --shadow-soft: 0 2px 12px -4px hsl(0 0% 0% / 0.4);
+    --shadow-elevated: 0 12px 32px -12px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 24px hsl(142 70% 50% / 0.35);
+    --sidebar-background: 150 25% 10%;
+    --sidebar-foreground: 90 20% 95%;
+    --sidebar-primary: 142 60% 50%;
+    --sidebar-primary-foreground: 150 30% 10%;
+    --sidebar-accent: 150 20% 18%;
+    --sidebar-accent-foreground: 90 20% 95%;
+    --sidebar-border: 150 18% 20%;
+    --sidebar-ring: 142 60% 50%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
+  * { @apply border-border; }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
   }
+  html { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer utilities {
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-fresh { background: var(--gradient-fresh); }
+  .gradient-soft { background: var(--gradient-soft); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .transition-base { transition: var(--transition-base); }
 }
