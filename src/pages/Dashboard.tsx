@@ -49,7 +49,6 @@ const Dashboard = () => {
   todaySlots.sort((a, b) => a.time.localeCompare(b.time));
 
   // Next upcoming
-  const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const toMin = (t: string) => {
     const [h, m] = t.split(":").map(Number);
