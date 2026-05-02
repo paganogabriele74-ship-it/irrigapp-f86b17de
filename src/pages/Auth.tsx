@@ -153,6 +153,27 @@ const Auth = () => {
                 <TabsTrigger value="signup">Registrati</TabsTrigger>
               </TabsList>
 
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={handleGoogle}
+                disabled={loading}
+                className="w-full mt-4 gap-2"
+              >
+                <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.4-1.66 4.1-5.5 4.1A6.2 6.2 0 1 1 12 5.8c1.95 0 3.27.83 4.02 1.55l2.74-2.64C17.05 3.14 14.74 2.2 12 2.2 6.6 2.2 2.2 6.6 2.2 12S6.6 21.8 12 21.8c6.93 0 11.5-4.87 11.5-11.73 0-.79-.08-1.39-.2-1.97H12z"/>
+                </svg>
+                Continua con Google
+              </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">oppure email</span>
+                </div>
+              </div>
+
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4 mt-4">
                   <div className="space-y-2">
