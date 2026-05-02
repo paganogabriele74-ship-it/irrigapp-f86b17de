@@ -117,6 +117,47 @@ const Dashboard = () => {
         </div>
       </section>
 
+      {/* Countdown to next irrigation */}
+      {nextSlot && nextSlotDate && (
+        <section className="mb-6">
+          <Card className="p-5 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
+                <Timer className="size-4" /> PROSSIMA IRRIGAZIONE
+              </div>
+              <div className="text-xs text-muted-foreground truncate text-right">
+                {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
+              </div>
+            </div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="font-semibold truncate">{nextSlot.program.name}</div>
+              <div className="flex items-center gap-1.5 tabular-nums">
+                {cdDays > 0 && (
+                  <div className="flex flex-col items-center">
+                    <span className="text-xl sm:text-2xl font-bold leading-none">{cdDays}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">g</span>
+                  </div>
+                )}
+                <div className="flex flex-col items-center">
+                  <span className="text-xl sm:text-2xl font-bold leading-none">{pad(cdH)}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase">h</span>
+                </div>
+                <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-xl sm:text-2xl font-bold leading-none">{pad(cdM)}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase">m</span>
+                </div>
+                <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-xl sm:text-2xl font-bold leading-none text-primary">{pad(cdS)}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase">s</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </section>
+      )}
+
       {/* Stats */}
       <section className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
         <Card className="p-4">
