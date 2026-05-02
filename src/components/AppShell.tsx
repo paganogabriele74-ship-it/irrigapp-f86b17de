@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Sprout, LayoutDashboard, ListTree, Plus, LogOut, CalendarDays } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { Sprout, LayoutDashboard, ListTree, Plus, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
