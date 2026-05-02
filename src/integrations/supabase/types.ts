@@ -14,7 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      program_times: {
+        Row: {
+          created_at: string
+          id: string
+          program_id: string
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          program_id: string
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          program_id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_times_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      programs: {
+        Row: {
+          active: boolean
+          created_at: string
+          days_of_week: number[]
+          dosage: Database["public"]["Enums"]["dosage_type"]
+          duration_minutes: number
+          id: string
+          image_url: string | null
+          name: string
+          sectors: number[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          days_of_week?: number[]
+          dosage?: Database["public"]["Enums"]["dosage_type"]
+          duration_minutes: number
+          id?: string
+          image_url?: string | null
+          name: string
+          sectors?: number[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          days_of_week?: number[]
+          dosage?: Database["public"]["Enums"]["dosage_type"]
+          duration_minutes?: number
+          id?: string
+          image_url?: string | null
+          name?: string
+          sectors?: number[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +114,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      dosage_type: "acqua" | "concime" | "acido"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +241,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      dosage_type: ["acqua", "concime", "acido"],
+    },
   },
 } as const
