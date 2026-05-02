@@ -109,7 +109,7 @@ const Dashboard = () => {
           <div className="relative">
             <p className="text-sm uppercase tracking-wider opacity-80 mb-1">{todayLabel}</p>
             <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
-              Ciao, {profile?.full_name?.split(" ")[0] ?? "amico"}.
+              Benvenuto su IrrigApp.
             </h1>
             <p className="text-base sm:text-lg opacity-95 mt-1">Ecco cosa abbiamo in programma oggi! 🌱</p>
           </div>
