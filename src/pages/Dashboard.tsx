@@ -79,6 +79,29 @@ const Dashboard = () => {
   const currentTimeStr = formatTime(`${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:00`);
   const upcomingTodayHighlight = todaySlots.find(s => toMin(s.time) > nowMinutes)?.time.slice(0, 5);
 
+  // Compute next slot Date for countdown
+  let nextSlotDate: Date | null = null;
+  if (nextSlot) {
+    const [h, m, s] = nextSlot.time.split(":").map(Number);
+    const offsetDays = (nextSlot.day - today + 7) % 7;
+    const target = new Date(now);
+    target.setHours(h, m, s || 0, 0);
+    if (offsetDays === 0 && target.getTime() <= now.getTime()) {
+      target.setDate(target.getDate() + 7);
+    } else {
+      target.setDate(target.getDate() + offsetDays);
+    }
+    nextSlotDate = target;
+  }
+
+  const diffMs = nextSlotDate ? nextSlotDate.getTime() - now.getTime() : 0;
+  const totalSec = Math.max(0, Math.floor(diffMs / 1000));
+  const cdDays = Math.floor(totalSec / 86400);
+  const cdH = Math.floor((totalSec % 86400) / 3600);
+  const cdM = Math.floor((totalSec % 3600) / 60);
+  const cdS = totalSec % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+
   return (
     <AppShell>
       <section className="mb-6">
