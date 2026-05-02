@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+
 import { AppShell } from "@/components/AppShell";
 import { ProgramCard } from "@/components/ProgramCard";
 import { Card } from "@/components/ui/card";
