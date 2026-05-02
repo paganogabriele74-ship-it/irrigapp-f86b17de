@@ -12,7 +12,6 @@ const navItems = [
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-0">
