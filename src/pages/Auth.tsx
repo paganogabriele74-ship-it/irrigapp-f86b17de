@@ -101,6 +101,20 @@ const Auth = () => {
     }
   };
 
+  const handleGoogle = async () => {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setLoading(false);
+      toast.error("Accesso con Google non riuscito");
+      return;
+    }
+    if (result.redirected) return;
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen gradient-soft flex items-center justify-center p-4">
       <div className="w-full max-w-md">
