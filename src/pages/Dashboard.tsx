@@ -16,7 +16,6 @@ interface Slot {
 }
 
 const Dashboard = () => {
-  const { profile } = useAuth();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => new Date());
