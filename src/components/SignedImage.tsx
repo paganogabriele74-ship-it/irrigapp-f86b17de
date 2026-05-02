@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
@@ -7,22 +6,10 @@ interface Props {
   className?: string;
 }
 
-/** Loads a private storage file via signed URL. */
+/** Loads a public storage file via public URL. */
 export const SignedImage = ({ path, alt, className }: Props) => {
-  const [url, setUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancel = false;
-    if (!path) {
-      setUrl(null);
-      return;
-    }
-    supabase.storage.from("program-images").createSignedUrl(path, 3600).then(({ data }) => {
-      if (!cancel) setUrl(data?.signedUrl ?? null);
-    });
-    return () => { cancel = true; };
-  }, [path]);
-
-  if (!path || !url) return null;
-  return <img src={url} alt={alt ?? ""} className={className} loading="lazy" />;
+  if (!path) return null;
+  const { data } = supabase.storage.from("program-images").getPublicUrl(path);
+  if (!data?.publicUrl) return null;
+  return <img src={data.publicUrl} alt={alt ?? ""} className={className} loading="lazy" />;
 };
