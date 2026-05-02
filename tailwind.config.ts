@@ -39,6 +39,18 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        water: {
+          DEFAULT: "hsl(var(--water))",
+          foreground: "hsl(var(--water-foreground))",
+        },
+        fertilizer: {
+          DEFAULT: "hsl(var(--fertilizer))",
+          foreground: "hsl(var(--fertilizer-foreground))",
+        },
+        acid: {
+          DEFAULT: "hsl(var(--acid))",
+          foreground: "hsl(var(--acid-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",

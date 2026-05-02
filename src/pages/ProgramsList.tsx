@@ -1,0 +1,177 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { AppShell } from "@/components/AppShell";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { SignedImage } from "@/components/SignedImage";
+import { Edit3, Trash2, Copy, Plus, Search, Droplets, Layers, Timer, Calendar } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { DAYS, DOSAGE_COLORS, DOSAGE_LABELS, formatSectors, Program } from "@/lib/irrigation";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
+const ProgramsList = () => {
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("programs")
+      .select("*, program_times(*)")
+      .order("created_at", { ascending: false });
+    setPrograms((data ?? []) as unknown as Program[]);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const toggleActive = async (p: Program) => {
+    const newVal = !p.active;
+    setPrograms(prev => prev.map(x => x.id === p.id ? { ...x, active: newVal } : x));
+    const { error } = await supabase.from("programs").update({ active: newVal }).eq("id", p.id);
+    if (error) {
+      toast.error("Errore aggiornamento");
+      load();
+    } else toast.success(newVal ? "Programma attivato" : "Programma disattivato");
+  };
+
+  const duplicate = async (p: Program) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: newP, error } = await supabase.from("programs").insert({
+      user_id: user.id,
+      name: `${p.name} (copia)`,
+      dosage: p.dosage,
+      duration_minutes: p.duration_minutes,
+      sectors: p.sectors,
+      days_of_week: p.days_of_week,
+      active: false,
+      image_url: p.image_url,
+    }).select().single();
+    if (error || !newP) return toast.error("Errore duplicazione");
+    if (p.program_times && p.program_times.length > 0) {
+      await supabase.from("program_times").insert(
+        p.program_times.map(t => ({ program_id: newP.id, start_time: t.start_time }))
+      );
+    }
+    toast.success("Programma duplicato");
+    load();
+  };
+
+  const remove = async (p: Program) => {
+    const { error } = await supabase.from("programs").delete().eq("id", p.id);
+    if (error) return toast.error("Errore eliminazione");
+    toast.success("Programma eliminato");
+    setPrograms(prev => prev.filter(x => x.id !== p.id));
+  };
+
+  const filtered = programs.filter(p => p.name.toLowerCase().includes(q.toLowerCase()));
+
+  return (
+    <AppShell>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-2xl font-bold">I miei programmi</h1>
+          <p className="text-sm text-muted-foreground">{programs.length} totali · {programs.filter(p => p.active).length} attivi</p>
+        </div>
+        <Button asChild>
+          <Link to="/programmi/nuovo"><Plus className="size-4" /> Nuovo</Link>
+        </Button>
+      </div>
+
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <Input className="pl-9" placeholder="Cerca programma..." value={q} onChange={(e) => setQ(e.target.value)} />
+      </div>
+
+      {loading ? (
+        <div className="space-y-3">
+          {[0,1,2].map(i => <div key={i} className="h-32 rounded-xl bg-muted animate-pulse" />)}
+        </div>
+      ) : filtered.length === 0 ? (
+        <Card className="p-10 text-center border-dashed">
+          <p className="text-muted-foreground mb-4">{programs.length === 0 ? "Nessun programma ancora." : "Nessun risultato."}</p>
+          {programs.length === 0 && (
+            <Button asChild><Link to="/programmi/nuovo"><Plus className="size-4" /> Crea il primo</Link></Button>
+          )}
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(p => (
+            <Card key={p.id} className={cn("overflow-hidden", !p.active && "opacity-70")}>
+              <div className="flex">
+                {p.image_url && (
+                  <div className="w-24 shrink-0 bg-muted">
+                    <SignedImage path={p.image_url} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="flex-1 p-4 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="font-semibold truncate">{p.name}</h3>
+                    <Switch checked={p.active} onCheckedChange={() => toggleActive(p)} />
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    <Badge className={cn("border-0", DOSAGE_COLORS[p.dosage])}>
+                      <Droplets className="size-3 mr-1" />{DOSAGE_LABELS[p.dosage]}
+                    </Badge>
+                    <Badge variant="outline" className="font-normal">
+                      <Timer className="size-3 mr-1" />{p.duration_minutes} min
+                    </Badge>
+                    <Badge variant="outline" className="font-normal">
+                      <Layers className="size-3 mr-1" />Settori {formatSectors(p.sectors)}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+                    <Calendar className="size-3.5" />
+                    {p.days_of_week.length === 0 ? "Nessun giorno" :
+                     p.days_of_week.length === 7 ? "Tutti i giorni" :
+                     [...p.days_of_week].sort().map(d => DAYS.find(x => x.id === d)?.short).join(", ")}
+                    {p.program_times && p.program_times.length > 0 && (
+                      <span> · {p.program_times.length} {p.program_times.length === 1 ? "orario" : "orari"}</span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    <Button size="sm" variant="outline" asChild>
+                      <Link to={`/programmi/${p.id}`}><Edit3 className="size-3.5" /> Modifica</Link>
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => duplicate(p)}>
+                      <Copy className="size-3.5" /> Duplica
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="outline" className="text-destructive hover:text-destructive">
+                          <Trash2 className="size-3.5" /> Elimina
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Eliminare "{p.name}"?</AlertDialogTitle>
+                          <AlertDialogDescription>Questa azione non può essere annullata.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Annulla</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => remove(p)} className="bg-destructive hover:bg-destructive/90">Elimina</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </AppShell>
+  );
+};
+
+export default ProgramsList;
