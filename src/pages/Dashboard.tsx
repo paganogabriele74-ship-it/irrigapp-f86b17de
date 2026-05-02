@@ -19,6 +19,7 @@ const Dashboard = () => {
   const { profile } = useAuth();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     (async () => {
@@ -29,6 +30,11 @@ const Dashboard = () => {
       setPrograms((data ?? []) as unknown as Program[]);
       setLoading(false);
     })();
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
   }, []);
 
   const today = jsDayToAppDay(new Date().getDay());
