@@ -122,35 +122,35 @@ const Dashboard = () => {
         <section className="mb-6">
           <Card className="p-5 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
             <div className="flex items-center justify-between gap-4 mb-3">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
+              <div className="flex items-center gap-2 text-muted-foreground font-extrabold text-lg">
                 <Timer className="size-4" /> PROSSIMA IRRIGAZIONE
               </div>
-              <div className="text-xs text-muted-foreground truncate text-right">
+              <div className="text-muted-foreground truncate text-right text-lg">
                 {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
               </div>
             </div>
             <div className="flex items-end justify-between gap-3">
-              <div className="font-semibold truncate">{nextSlot.program.name}</div>
+              <div className="font-semibold truncate text-3xl">{nextSlot.program.name}</div>
               <div className="flex items-center gap-1.5 tabular-nums text-xs font-mono">
                 {cdDays > 0 && (
                   <div className="flex flex-col items-center">
-                    <span className="text-xl sm:text-2xl font-bold leading-none">{cdDays}</span>
-                    <span className="text-[10px] text-muted-foreground uppercase">g</span>
+                    <span className="sm:text-2xl font-bold leading-none text-6xl text-primary">{cdDays}</span>
+                    <span className="text-muted-foreground uppercase text-base">g</span>
                   </div>
                 )}
                 <div className="flex flex-col items-center">
-                  <span className="text-xl sm:text-2xl font-bold leading-none">{pad(cdH)}</span>
-                  <span className="text-[10px] text-muted-foreground uppercase">h</span>
+                  <span className="sm:text-2xl font-bold leading-none text-6xl text-primary">{pad(cdH)}</span>
+                  <span className="text-muted-foreground uppercase text-base">h</span>
                 </div>
                 <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
                 <div className="flex flex-col items-center">
-                  <span className="text-xl sm:text-2xl font-bold leading-none">{pad(cdM)}</span>
-                  <span className="text-[10px] text-muted-foreground uppercase">m</span>
+                  <span className="sm:text-2xl font-bold leading-none text-6xl text-primary">{pad(cdM)}</span>
+                  <span className="text-muted-foreground uppercase text-base">m</span>
                 </div>
                 <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
                 <div className="flex flex-col items-center">
-                  <span className="text-xl sm:text-2xl font-bold leading-none text-primary">{pad(cdS)}</span>
-                  <span className="text-[10px] text-muted-foreground uppercase">s</span>
+                  <span className="sm:text-2xl font-bold leading-none text-primary text-6xl">{pad(cdS)}</span>
+                  <span className="text-muted-foreground uppercase text-base">s</span>
                 </div>
               </div>
             </div>
