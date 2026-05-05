@@ -23,30 +23,30 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
       )}>
         <div className="flex">
           {program.image_url && (
-            <div className="w-16 sm:w-24 shrink-0 bg-muted">
+            <div className="w-24 sm:w-28 shrink-0 bg-muted">
               <SignedImage path={program.image_url} className="w-full h-full object-cover" />
             </div>
           )}
           <div className="flex-1 p-3 sm:p-4 min-w-0">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="min-w-0">
-                <h3 className="font-semibold truncate transition-base text-base sm:text-lg">{program.name}</h3>
+                <h3 className="font-bold truncate transition-base text-lg sm:text-xl text-foreground">{program.name}</h3>
                 {!program.active && <span className="text-xs text-muted-foreground">Disattivato</span>}
               </div>
-              <Badge className={cn("shrink-0 border-0 text-xs", DOSAGE_COLORS[program.dosage])}>
-                <Droplets className="size-3 mr-1" />
+              <Badge className={cn("shrink-0 border-0 text-sm font-semibold px-2.5 py-1", DOSAGE_COLORS[program.dosage])}>
+                <Droplets className="size-3.5 mr-1" />
                 {DOSAGE_LABELS[program.dosage]}
               </Badge>
             </div>
 
-            <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs sm:text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <Layers className="size-3.5" />
-                Settori <span className="text-foreground font-semibold">{formatSectors(program.sectors)}</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <Layers className="size-4" />
+                Settori <span className="text-foreground font-bold text-base">{formatSectors(program.sectors)}</span>
               </span>
-              <span className="flex items-center gap-1.5">
-                <AlarmClock className="size-3.5" />
-                <span className="text-foreground font-semibold">{program.duration_minutes} min</span>
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <AlarmClock className="size-4" />
+                <span className="text-foreground font-bold text-base">{program.duration_minutes} min</span>
               </span>
             </div>
 

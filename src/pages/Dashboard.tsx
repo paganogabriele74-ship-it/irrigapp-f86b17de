@@ -198,8 +198,8 @@ const Dashboard = () => {
           <div className="space-y-3">
             {todaySlots.map((slot, i) => (
               <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex gap-2 sm:gap-3">
-                <div className="w-12 sm:w-16 shrink-0 pt-3">
-                  <div className="text-sm sm:text-base font-bold tabular-nums">{formatTime(slot.time)}</div>
+                <div className="w-14 sm:w-16 shrink-0 pt-3">
+                  <div className="text-base sm:text-lg font-bold tabular-nums text-primary">{formatTime(slot.time)}</div>
                 </div>
                 <div className="flex-1">
                   <ProgramCard program={slot.program} highlightTime={upcomingTodayHighlight} compact />
