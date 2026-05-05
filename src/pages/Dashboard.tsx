@@ -195,13 +195,13 @@ const Dashboard = () => {
             </Button>
           </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {todaySlots.map((slot, i) => (
-              <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex gap-2 sm:gap-3">
-                <div className="w-14 sm:w-16 shrink-0 pt-3">
-                  <div className="text-base sm:text-lg font-bold tabular-nums text-primary">{formatTime(slot.time)}</div>
+              <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+                <div className="self-start rounded-lg bg-primary px-3 py-1.5 shadow-soft sm:w-16 sm:shrink-0 sm:bg-transparent sm:px-0 sm:py-3 sm:shadow-none">
+                  <div className="text-lg font-extrabold tabular-nums leading-none text-primary-foreground sm:text-primary sm:text-lg">{formatTime(slot.time)}</div>
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <ProgramCard program={slot.program} highlightTime={upcomingTodayHighlight} compact />
                 </div>
               </div>

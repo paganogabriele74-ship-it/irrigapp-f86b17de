@@ -19,34 +19,38 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
     <Link to={`/programmi/${program.id}`} className="block group">
       <Card className={cn(
         "overflow-hidden border-border/60 shadow-soft hover:shadow-elevated transition-base",
+        compact && "border-primary/15",
         !program.active && "opacity-60"
       )}>
-        <div className="flex">
+        <div className={cn("flex", compact && "flex-col sm:flex-row")}>
           {program.image_url && (
-            <div className="w-24 sm:w-28 shrink-0 bg-muted">
+            <div className={cn("w-24 sm:w-28 shrink-0 bg-muted", compact && "hidden sm:block sm:w-24")}>
               <SignedImage path={program.image_url} className="w-full h-full object-cover" />
             </div>
           )}
-          <div className="flex-1 p-3 sm:p-4 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
+          <div className={cn("flex-1 p-3 sm:p-4 min-w-0", compact && "p-3") }>
+            <div className={cn("flex items-start justify-between gap-2 mb-2", compact && "flex-col sm:flex-row sm:items-start")}>
               <div className="min-w-0">
-                <h3 className="font-bold truncate transition-base text-lg sm:text-xl text-foreground">{program.name}</h3>
+                <h3 className={cn(
+                  "font-bold transition-base text-lg sm:text-xl text-foreground",
+                  compact ? "text-xl leading-tight break-words" : "truncate"
+                )}>{program.name}</h3>
                 {!program.active && <span className="text-xs text-muted-foreground">Disattivato</span>}
               </div>
-              <Badge className={cn("shrink-0 border-0 text-sm font-semibold px-2.5 py-1", DOSAGE_COLORS[program.dosage])}>
+              <Badge className={cn("shrink-0 border-0 text-sm font-semibold px-2.5 py-1", compact && "text-xs sm:text-sm", DOSAGE_COLORS[program.dosage])}>
                 <Droplets className="size-3.5 mr-1" />
                 {DOSAGE_LABELS[program.dosage]}
               </Badge>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <Layers className="size-4" />
-                Settori <span className="text-foreground font-bold text-base">{formatSectors(program.sectors)}</span>
+            <div className={cn("flex flex-wrap items-center gap-x-4 gap-y-1 text-sm", compact && "grid grid-cols-2 gap-2") }>
+              <span className={cn("flex items-center gap-1.5 text-muted-foreground", compact && "rounded-lg bg-secondary/70 p-2") }>
+                <Layers className={cn("size-4", compact && "size-5 text-primary")} />
+                <span className={cn(compact && "flex flex-col leading-tight")}>Settori <span className={cn("text-foreground font-bold text-base", compact && "text-xl")}>{formatSectors(program.sectors)}</span></span>
               </span>
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <AlarmClock className="size-4" />
-                <span className="text-foreground font-bold text-base">{program.duration_minutes} min</span>
+              <span className={cn("flex items-center gap-1.5 text-muted-foreground", compact && "rounded-lg bg-secondary/70 p-2") }>
+                <AlarmClock className={cn("size-4", compact && "size-5 text-primary")} />
+                <span className={cn(compact && "flex flex-col leading-tight")}>Durata <span className={cn("text-foreground font-bold text-base", compact && "text-xl")}>{program.duration_minutes} min</span></span>
               </span>
             </div>
 
