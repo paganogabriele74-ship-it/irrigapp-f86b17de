@@ -24,7 +24,7 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
       )}>
         <div className={cn("flex", compact && "flex-col sm:flex-row")}>
           {program.image_url && (
-            <div className={cn("w-24 sm:w-28 shrink-0 bg-muted", compact && "hidden sm:block sm:w-24")}>
+            <div className={cn("shrink-0 bg-muted", compact ? "h-32 w-full sm:h-auto sm:w-28" : "w-24 sm:w-28")}>
               <SignedImage path={program.image_url} className="w-full h-full object-cover" />
             </div>
           )}
