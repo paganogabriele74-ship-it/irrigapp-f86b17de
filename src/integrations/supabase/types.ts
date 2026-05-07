@@ -77,6 +77,7 @@ export type Database = {
           sectors: number[]
           updated_at: string
           user_id: string | null
+          week_pattern: string
         }
         Insert: {
           active?: boolean
@@ -90,6 +91,7 @@ export type Database = {
           sectors?: number[]
           updated_at?: string
           user_id?: string | null
+          week_pattern?: string
         }
         Update: {
           active?: boolean
@@ -103,6 +105,7 @@ export type Database = {
           sectors?: number[]
           updated_at?: string
           user_id?: string | null
+          week_pattern?: string
         }
         Relationships: []
       }
