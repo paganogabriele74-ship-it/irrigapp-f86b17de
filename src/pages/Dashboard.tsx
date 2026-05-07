@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarClock, Sparkles, Plus, ListTree, Timer } from "lucide-react";
-import { DAYS, formatTime, jsDayToAppDay, Program } from "@/lib/irrigation";
+import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek } from "@/lib/irrigation";
 
 interface Slot {
   time: string;
