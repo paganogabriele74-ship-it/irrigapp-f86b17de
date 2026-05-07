@@ -31,7 +31,7 @@ const DaysView = () => {
 
   const slots: { time: string; program: Program }[] = [];
   programs
-    .filter(p => p.days_of_week.includes(selected))
+    .filter(p => p.days_of_week.includes(selected) && programRunsThisWeek((p.week_pattern ?? "every") as WeekPattern, selectedWeek))
     .forEach(p => p.program_times?.forEach(t => slots.push({ time: t.start_time, program: p })));
   slots.sort((a, b) => a.time.localeCompare(b.time));
 
