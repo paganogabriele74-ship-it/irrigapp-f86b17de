@@ -55,7 +55,7 @@ const Dashboard = () => {
     return h * 60 + m;
   };
 
-  let nextSlot: { day: number; dayLabel: string; time: string; program: Program } | null = null;
+  let nextSlot: { day: number; dayLabel: string; time: string; program: Program; offsetDays: number } | null = null;
   // Look ahead 14 days (to cover A/B alternating weeks)
   for (let offset = 0; offset < 14 && !nextSlot; offset++) {
     const checkDay = ((today - 1 + offset) % 7) + 1;
@@ -74,6 +74,7 @@ const Dashboard = () => {
         dayLabel: offset === 0 ? "Oggi" : offset === 1 ? "Domani" : DAYS.find(d => d.id === checkDay)?.full ?? "",
         time: c.time,
         program: c.program,
+        offsetDays: offset,
       };
       break;
     }
@@ -86,14 +87,9 @@ const Dashboard = () => {
   let nextSlotDate: Date | null = null;
   if (nextSlot) {
     const [h, m, s] = nextSlot.time.split(":").map(Number);
-    const offsetDays = (nextSlot.day - today + 7) % 7;
     const target = new Date(now);
     target.setHours(h, m, s || 0, 0);
-    if (offsetDays === 0 && target.getTime() <= now.getTime()) {
-      target.setDate(target.getDate() + 7);
-    } else {
-      target.setDate(target.getDate() + offsetDays);
-    }
+    target.setDate(target.getDate() + nextSlot.offsetDays);
     nextSlotDate = target;
   }
 
