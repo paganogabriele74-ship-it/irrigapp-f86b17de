@@ -31,6 +31,7 @@ const ProgramForm = () => {
   const [dosage, setDosage] = useState<DosageType>("acqua");
   const [duration, setDuration] = useState<number>(15);
   const [days, setDays] = useState<number[]>([]);
+  const [weekPattern, setWeekPattern] = useState<WeekPattern>("every");
   const [sectors, setSectors] = useState<number[]>([]);
   const [times, setTimes] = useState<string[]>(["08:00"]);
   const [active, setActive] = useState(true);
