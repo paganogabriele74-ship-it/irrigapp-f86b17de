@@ -56,12 +56,15 @@ const Dashboard = () => {
   };
 
   let nextSlot: { day: number; dayLabel: string; time: string; program: Program } | null = null;
-  // Look ahead 7 days
-  for (let offset = 0; offset < 7 && !nextSlot; offset++) {
+  // Look ahead 14 days (to cover A/B alternating weeks)
+  for (let offset = 0; offset < 14 && !nextSlot; offset++) {
     const checkDay = ((today - 1 + offset) % 7) + 1;
+    const checkDate = new Date(now);
+    checkDate.setDate(checkDate.getDate() + offset);
+    const checkWeek = getCurrentWeekLetter(checkDate);
     const candidates: { time: string; program: Program }[] = [];
     activePrograms
-      .filter(p => p.days_of_week.includes(checkDay))
+      .filter(p => p.days_of_week.includes(checkDay) && programRunsThisWeek(p.week_pattern ?? "every", checkWeek))
       .forEach(p => p.program_times?.forEach(t => candidates.push({ time: t.start_time, program: p })));
     candidates.sort((a, b) => a.time.localeCompare(b.time));
     for (const c of candidates) {
