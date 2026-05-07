@@ -83,6 +83,44 @@ const Dashboard = () => {
   const currentTimeStr = formatTime(`${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:00`);
   const upcomingTodayHighlight = todaySlots.find(s => toMin(s.time) > nowMinutes)?.time.slice(0, 5);
 
+  // Currently running program (in real time)
+  const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const toSec = (t: string) => {
+    const [h, m, s] = t.split(":").map(Number);
+    return h * 3600 + m * 60 + (s || 0);
+  };
+  let currentRun: {
+    program: Program;
+    startTime: string;
+    totalSeconds: number;
+    elapsedSeconds: number;
+    currentSectorIndex: number;
+    currentSector: number;
+    sectorElapsedSeconds: number;
+    sectorDurationSeconds: number;
+  } | null = null;
+  for (const slot of todaySlots) {
+    const startSec = toSec(slot.time);
+    const sectorDurSec = slot.program.duration_minutes * 60;
+    const totalSec = sectorDurSec * slot.program.sectors.length;
+    if (nowSeconds >= startSec && nowSeconds < startSec + totalSec) {
+      const elapsed = nowSeconds - startSec;
+      const idx = Math.floor(elapsed / sectorDurSec);
+      const sortedSectors = [...slot.program.sectors].sort((a, b) => a - b);
+      currentRun = {
+        program: slot.program,
+        startTime: slot.time,
+        totalSeconds: totalSec,
+        elapsedSeconds: elapsed,
+        currentSectorIndex: idx,
+        currentSector: sortedSectors[idx],
+        sectorElapsedSeconds: elapsed - idx * sectorDurSec,
+        sectorDurationSeconds: sectorDurSec,
+      };
+      break;
+    }
+  }
+
   // Compute next slot Date for countdown
   let nextSlotDate: Date | null = null;
   if (nextSlot) {
