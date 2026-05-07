@@ -7,7 +7,7 @@ import { ProgramCard } from "@/components/ProgramCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarClock, Sparkles, Plus, ListTree, Timer } from "lucide-react";
+import { CalendarClock, Sparkles, Plus, ListTree, Timer, Droplets, Activity } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek } from "@/lib/irrigation";
 
 interface Slot {
@@ -83,6 +83,44 @@ const Dashboard = () => {
   const currentTimeStr = formatTime(`${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:00`);
   const upcomingTodayHighlight = todaySlots.find(s => toMin(s.time) > nowMinutes)?.time.slice(0, 5);
 
+  // Currently running program (in real time)
+  const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const toSec = (t: string) => {
+    const [h, m, s] = t.split(":").map(Number);
+    return h * 3600 + m * 60 + (s || 0);
+  };
+  let currentRun: {
+    program: Program;
+    startTime: string;
+    totalSeconds: number;
+    elapsedSeconds: number;
+    currentSectorIndex: number;
+    currentSector: number;
+    sectorElapsedSeconds: number;
+    sectorDurationSeconds: number;
+  } | null = null;
+  for (const slot of todaySlots) {
+    const startSec = toSec(slot.time);
+    const sectorDurSec = slot.program.duration_minutes * 60;
+    const totalSec = sectorDurSec * slot.program.sectors.length;
+    if (nowSeconds >= startSec && nowSeconds < startSec + totalSec) {
+      const elapsed = nowSeconds - startSec;
+      const idx = Math.floor(elapsed / sectorDurSec);
+      const sortedSectors = [...slot.program.sectors].sort((a, b) => a - b);
+      currentRun = {
+        program: slot.program,
+        startTime: slot.time,
+        totalSeconds: totalSec,
+        elapsedSeconds: elapsed,
+        currentSectorIndex: idx,
+        currentSector: sortedSectors[idx],
+        sectorElapsedSeconds: elapsed - idx * sectorDurSec,
+        sectorDurationSeconds: sectorDurSec,
+      };
+      break;
+    }
+  }
+
   // Compute next slot Date for countdown
   let nextSlotDate: Date | null = null;
   if (nextSlot) {
@@ -115,6 +153,59 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
+
+      {/* Currently running */}
+      {currentRun && (
+        <section className="mb-6">
+          <Card className="p-5 border-primary/40 bg-gradient-to-br from-primary/15 to-accent/10 shadow-elevated relative overflow-hidden">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              <span className="relative flex size-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full size-2.5 bg-primary" />
+              </span>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary">LIVE</span>
+            </div>
+            <div className="flex items-center gap-2 text-primary font-extrabold text-base mb-2">
+              <Activity className="size-4" /> IN ESECUZIONE ORA
+            </div>
+            <div className="font-bold text-lg leading-tight mb-3 truncate">{currentRun.program.name}</div>
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="rounded-lg bg-background/60 p-2.5">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settore attivo</div>
+                <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                  {currentRun.currentSector}
+                  <span className="text-sm text-muted-foreground font-medium ml-1">
+                    ({currentRun.currentSectorIndex + 1}/{currentRun.program.sectors.length})
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg bg-background/60 p-2.5">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo settore</div>
+                <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                  {pad(Math.floor(currentRun.sectorElapsedSeconds / 60))}:{pad(currentRun.sectorElapsedSeconds % 60)}
+                  <span className="text-sm text-muted-foreground font-medium ml-1">
+                    /{currentRun.program.duration_minutes}m
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground tabular-nums">
+                <span>Avvio: {formatTime(currentRun.startTime)}</span>
+                <span>
+                  {pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)} / {Math.floor(currentRun.totalSeconds / 60)}m
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-1000"
+                  style={{ width: `${Math.min(100, (currentRun.elapsedSeconds / currentRun.totalSeconds) * 100)}%` }}
+                />
+              </div>
+            </div>
+          </Card>
+        </section>
+      )}
 
       {/* Countdown to next irrigation */}
       {nextSlot && nextSlotDate && (
