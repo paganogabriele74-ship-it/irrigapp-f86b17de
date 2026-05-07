@@ -154,6 +154,59 @@ const Dashboard = () => {
         </div>
       </section>
 
+      {/* Currently running */}
+      {currentRun && (
+        <section className="mb-6">
+          <Card className="p-5 border-primary/40 bg-gradient-to-br from-primary/15 to-accent/10 shadow-elevated relative overflow-hidden">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              <span className="relative flex size-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full size-2.5 bg-primary" />
+              </span>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary">LIVE</span>
+            </div>
+            <div className="flex items-center gap-2 text-primary font-extrabold text-base mb-2">
+              <Activity className="size-4" /> IN ESECUZIONE ORA
+            </div>
+            <div className="font-bold text-lg leading-tight mb-3 truncate">{currentRun.program.name}</div>
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="rounded-lg bg-background/60 p-2.5">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settore attivo</div>
+                <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                  {currentRun.currentSector}
+                  <span className="text-sm text-muted-foreground font-medium ml-1">
+                    ({currentRun.currentSectorIndex + 1}/{currentRun.program.sectors.length})
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg bg-background/60 p-2.5">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo settore</div>
+                <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                  {pad(Math.floor(currentRun.sectorElapsedSeconds / 60))}:{pad(currentRun.sectorElapsedSeconds % 60)}
+                  <span className="text-sm text-muted-foreground font-medium ml-1">
+                    /{currentRun.program.duration_minutes}m
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground tabular-nums">
+                <span>Avvio: {formatTime(currentRun.startTime)}</span>
+                <span>
+                  {pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)} / {Math.floor(currentRun.totalSeconds / 60)}m
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-1000"
+                  style={{ width: `${Math.min(100, (currentRun.elapsedSeconds / currentRun.totalSeconds) * 100)}%` }}
+                />
+              </div>
+            </div>
+          </Card>
+        </section>
+      )}
+
       {/* Countdown to next irrigation */}
       {nextSlot && nextSlotDate && (
         <section className="mb-6">
