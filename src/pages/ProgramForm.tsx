@@ -58,6 +58,7 @@ const ProgramForm = () => {
       setDosage(data.dosage as DosageType);
       setDuration(data.duration_minutes);
       setDays(data.days_of_week);
+      setWeekPattern(((data as any).week_pattern ?? "every") as WeekPattern);
       setSectors(data.sectors);
       setActive(data.active);
       setImagePath(data.image_url);
