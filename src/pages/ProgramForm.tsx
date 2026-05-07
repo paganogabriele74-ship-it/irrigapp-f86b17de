@@ -223,7 +223,29 @@ const ProgramForm = () => {
           </div>
         </Card>
 
-        {/* Times */}
+        {/* Week pattern */}
+        <Card className="p-5">
+          <Label className="text-base mb-1 block">Frequenza settimanale</Label>
+          <p className="text-xs text-muted-foreground mb-3">Scegli se il programma parte ogni settimana o a settimane alternate (A / B).</p>
+          <div className="grid grid-cols-3 gap-1.5">
+            {(Object.keys(WEEK_PATTERN_LABELS) as WeekPattern[]).map(w => {
+              const sel = weekPattern === w;
+              return (
+                <button
+                  key={w}
+                  type="button"
+                  onClick={() => setWeekPattern(w)}
+                  className={cn(
+                    "py-3 rounded-xl text-sm font-semibold transition-base",
+                    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                  )}
+                >
+                  {WEEK_PATTERN_LABELS[w]}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
         <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <Label className="text-base">Orari di partenza</Label>
