@@ -1,0 +1,1 @@
+ALTER TABLE public.programs ADD COLUMN week_pattern text NOT NULL DEFAULT 'every' CHECK (week_pattern IN ('every', 'A', 'B'));

@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { SignedImage } from "@/components/SignedImage";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock } from "lucide-react";
-import { DAYS, DOSAGE_LABELS, DosageType, SECTORS } from "@/lib/irrigation";
+import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,7 @@ const ProgramForm = () => {
   const [dosage, setDosage] = useState<DosageType>("acqua");
   const [duration, setDuration] = useState<number>(15);
   const [days, setDays] = useState<number[]>([]);
+  const [weekPattern, setWeekPattern] = useState<WeekPattern>("every");
   const [sectors, setSectors] = useState<number[]>([]);
   const [times, setTimes] = useState<string[]>(["08:00"]);
   const [active, setActive] = useState(true);
@@ -57,6 +58,7 @@ const ProgramForm = () => {
       setDosage(data.dosage as DosageType);
       setDuration(data.duration_minutes);
       setDays(data.days_of_week);
+      setWeekPattern(((data as any).week_pattern ?? "every") as WeekPattern);
       setSectors(data.sectors);
       setActive(data.active);
       setImagePath(data.image_url);
@@ -124,6 +126,7 @@ const ProgramForm = () => {
       days_of_week: days,
       active,
       image_url: finalImagePath,
+      week_pattern: weekPattern,
     };
 
     let programId = id!;
@@ -220,7 +223,29 @@ const ProgramForm = () => {
           </div>
         </Card>
 
-        {/* Times */}
+        {/* Week pattern */}
+        <Card className="p-5">
+          <Label className="text-base mb-1 block">Frequenza settimanale</Label>
+          <p className="text-xs text-muted-foreground mb-3">Scegli se il programma parte ogni settimana o a settimane alternate (A / B).</p>
+          <div className="grid grid-cols-3 gap-1.5">
+            {(Object.keys(WEEK_PATTERN_LABELS) as WeekPattern[]).map(w => {
+              const sel = weekPattern === w;
+              return (
+                <button
+                  key={w}
+                  type="button"
+                  onClick={() => setWeekPattern(w)}
+                  className={cn(
+                    "py-3 rounded-xl text-sm font-semibold transition-base",
+                    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                  )}
+                >
+                  {WEEK_PATTERN_LABELS[w]}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
         <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <Label className="text-base">Orari di partenza</Label>

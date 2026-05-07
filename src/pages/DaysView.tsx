@@ -6,7 +6,7 @@ import { ProgramCard } from "@/components/ProgramCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { DAYS, formatTime, jsDayToAppDay, Program } from "@/lib/irrigation";
+import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, WeekPattern } from "@/lib/irrigation";
 import { cn } from "@/lib/utils";
 
 const DaysView = () => {
@@ -15,6 +15,8 @@ const DaysView = () => {
   const selected = day ? Number(day) : today;
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const currentWeek = getCurrentWeekLetter();
+  const [selectedWeek, setSelectedWeek] = useState<"A" | "B">(currentWeek);
 
   useEffect(() => {
     (async () => {
@@ -29,7 +31,7 @@ const DaysView = () => {
 
   const slots: { time: string; program: Program }[] = [];
   programs
-    .filter(p => p.days_of_week.includes(selected))
+    .filter(p => p.days_of_week.includes(selected) && programRunsThisWeek((p.week_pattern ?? "every") as WeekPattern, selectedWeek))
     .forEach(p => p.program_times?.forEach(t => slots.push({ time: t.start_time, program: p })));
   slots.sort((a, b) => a.time.localeCompare(b.time));
 
@@ -40,13 +42,41 @@ const DaysView = () => {
         <p className="text-muted-foreground text-sm">Tocca un giorno per vedere le irrigazioni.</p>
       </div>
 
+      {/* Week selector A / B */}
+      <div className="grid grid-cols-2 gap-1.5 mb-4 p-1 bg-secondary rounded-xl">
+        {(["A", "B"] as const).map(w => {
+          const sel = selectedWeek === w;
+          const isCurrent = currentWeek === w;
+          return (
+            <button
+              key={w}
+              type="button"
+              onClick={() => setSelectedWeek(w)}
+              className={cn(
+                "py-2.5 rounded-lg text-sm font-semibold transition-base flex items-center justify-center gap-2",
+                sel ? "gradient-primary text-primary-foreground shadow-soft" : "text-secondary-foreground hover:bg-background/50"
+              )}
+            >
+              Settimana {w}
+              {isCurrent && (
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase",
+                  sel ? "bg-primary-foreground/20" : "bg-primary text-primary-foreground"
+                )}>Ora</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Day selector */}
       <div className="grid grid-cols-7 gap-1.5 mb-6">
         {DAYS.map((d) => {
-          const count = programs.filter(p => p.days_of_week.includes(d.id))
+          const count = programs
+            .filter(p => p.days_of_week.includes(d.id) && programRunsThisWeek((p.week_pattern ?? "every") as WeekPattern, selectedWeek))
             .reduce((acc, p) => acc + (p.program_times?.length ?? 0), 0);
           const active = d.id === selected;
-          const isToday = d.id === today;
+          const isToday = d.id === today && selectedWeek === currentWeek;
           return (
             <Link
               key={d.id}

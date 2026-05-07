@@ -45,6 +45,29 @@ export const formatSectors = (sectors: number[]) => {
   return ranges.join(", ");
 };
 
+export type WeekPattern = "every" | "A" | "B";
+
+export const WEEK_PATTERN_LABELS: Record<WeekPattern, string> = {
+  every: "Ogni settimana",
+  A: "Settimana A",
+  B: "Settimana B",
+};
+
+// ISO week number → A (odd) / B (even). Used to determine current week parity.
+export const getIsoWeek = (date: Date) => {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+};
+
+export const getCurrentWeekLetter = (date = new Date()): "A" | "B" =>
+  getIsoWeek(date) % 2 === 1 ? "A" : "B";
+
+export const programRunsThisWeek = (pattern: WeekPattern, weekLetter: "A" | "B") =>
+  pattern === "every" || pattern === weekLetter;
+
 export interface Program {
   id: string;
   user_id: string;
@@ -55,6 +78,7 @@ export interface Program {
   days_of_week: number[];
   active: boolean;
   image_url: string | null;
+  week_pattern: WeekPattern;
   created_at: string;
   updated_at: string;
   program_times?: { id: string; start_time: string; program_id: string }[];
