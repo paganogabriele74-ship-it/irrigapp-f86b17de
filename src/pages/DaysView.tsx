@@ -15,6 +15,8 @@ const DaysView = () => {
   const selected = day ? Number(day) : today;
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const currentWeek = getCurrentWeekLetter();
+  const [selectedWeek, setSelectedWeek] = useState<"A" | "B">(currentWeek);
 
   useEffect(() => {
     (async () => {
