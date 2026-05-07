@@ -6,7 +6,7 @@ import { ProgramCard } from "@/components/ProgramCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { DAYS, formatTime, jsDayToAppDay, Program } from "@/lib/irrigation";
+import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, WeekPattern } from "@/lib/irrigation";
 import { cn } from "@/lib/utils";
 
 const DaysView = () => {
