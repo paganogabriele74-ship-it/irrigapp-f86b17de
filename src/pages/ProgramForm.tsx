@@ -126,6 +126,7 @@ const ProgramForm = () => {
       days_of_week: days,
       active,
       image_url: finalImagePath,
+      week_pattern: weekPattern,
     };
 
     let programId = id!;
