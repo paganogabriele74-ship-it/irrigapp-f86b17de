@@ -42,13 +42,41 @@ const DaysView = () => {
         <p className="text-muted-foreground text-sm">Tocca un giorno per vedere le irrigazioni.</p>
       </div>
 
+      {/* Week selector A / B */}
+      <div className="grid grid-cols-2 gap-1.5 mb-4 p-1 bg-secondary rounded-xl">
+        {(["A", "B"] as const).map(w => {
+          const sel = selectedWeek === w;
+          const isCurrent = currentWeek === w;
+          return (
+            <button
+              key={w}
+              type="button"
+              onClick={() => setSelectedWeek(w)}
+              className={cn(
+                "py-2.5 rounded-lg text-sm font-semibold transition-base flex items-center justify-center gap-2",
+                sel ? "gradient-primary text-primary-foreground shadow-soft" : "text-secondary-foreground hover:bg-background/50"
+              )}
+            >
+              Settimana {w}
+              {isCurrent && (
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase",
+                  sel ? "bg-primary-foreground/20" : "bg-primary text-primary-foreground"
+                )}>Ora</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Day selector */}
       <div className="grid grid-cols-7 gap-1.5 mb-6">
         {DAYS.map((d) => {
-          const count = programs.filter(p => p.days_of_week.includes(d.id))
+          const count = programs
+            .filter(p => p.days_of_week.includes(d.id) && programRunsThisWeek((p.week_pattern ?? "every") as WeekPattern, selectedWeek))
             .reduce((acc, p) => acc + (p.program_times?.length ?? 0), 0);
           const active = d.id === selected;
-          const isToday = d.id === today;
+          const isToday = d.id === today && selectedWeek === currentWeek;
           return (
             <Link
               key={d.id}
