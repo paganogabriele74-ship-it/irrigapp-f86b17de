@@ -38,12 +38,13 @@ const Dashboard = () => {
 
   const today = jsDayToAppDay(new Date().getDay());
   const todayLabel = DAYS.find(d => d.id === today)?.full ?? "";
+  const currentWeekLetter = getCurrentWeekLetter(now);
   const activePrograms = programs.filter(p => p.active);
 
-  // Today's slots
+  // Today's slots (filtered by week pattern)
   const todaySlots: Slot[] = [];
   activePrograms
-    .filter(p => p.days_of_week.includes(today))
+    .filter(p => p.days_of_week.includes(today) && programRunsThisWeek(p.week_pattern ?? "every", currentWeekLetter))
     .forEach(p => p.program_times?.forEach(t => todaySlots.push({ time: t.start_time, program: p })));
   todaySlots.sort((a, b) => a.time.localeCompare(b.time));
 
