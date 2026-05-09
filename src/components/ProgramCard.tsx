@@ -41,6 +41,11 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
                     Sett. {program.week_pattern}
                   </span>
                 )}
+                {program.sector_mode === "sequential" && (
+                  <span className="ml-1 inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground align-middle">
+                    Sequenza
+                  </span>
+                )}
               </div>
               <Badge className={cn("shrink-0 border-0 text-sm font-semibold px-2.5 py-1", compact && "text-xs sm:text-sm", DOSAGE_COLORS[program.dosage])}>
                 <Droplets className="size-3.5 mr-1" />
