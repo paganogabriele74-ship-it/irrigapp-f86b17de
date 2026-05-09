@@ -129,6 +129,7 @@ const ProgramForm = () => {
       active,
       image_url: finalImagePath,
       week_pattern: weekPattern,
+      sector_mode: sectorMode,
     };
 
     let programId = id!;
