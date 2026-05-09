@@ -89,24 +89,51 @@ const Dashboard = () => {
     const [h, m, s] = t.split(":").map(Number);
     return h * 3600 + m * 60 + (s || 0);
   };
-  let currentRun: {
+  type CurrentRun = {
     program: Program;
     startTime: string;
     totalSeconds: number;
     elapsedSeconds: number;
+    mode: "parallel" | "sequential";
     activeSectors: number[];
-  } | null = null;
+    currentSector?: number;
+    currentSectorIndex?: number;
+    sectorElapsedSeconds?: number;
+    sectorDurationSeconds?: number;
+  };
+  let currentRun: CurrentRun | null = null;
   for (const slot of todaySlots) {
     const startSec = toSec(slot.time);
-    const totalSec = slot.program.duration_minutes * 60;
+    const sectorDurSec = slot.program.duration_minutes * 60;
+    const mode = (slot.program.sector_mode ?? "parallel") as "parallel" | "sequential";
+    const totalSec = getProgramTotalMinutes(slot.program) * 60;
     if (nowSeconds >= startSec && nowSeconds < startSec + totalSec) {
-      currentRun = {
-        program: slot.program,
-        startTime: slot.time,
-        totalSeconds: totalSec,
-        elapsedSeconds: nowSeconds - startSec,
-        activeSectors: [...slot.program.sectors].sort((a, b) => a - b),
-      };
+      const elapsed = nowSeconds - startSec;
+      const sortedSectors = [...slot.program.sectors].sort((a, b) => a - b);
+      if (mode === "sequential") {
+        const idx = Math.min(sortedSectors.length - 1, Math.floor(elapsed / sectorDurSec));
+        currentRun = {
+          program: slot.program,
+          startTime: slot.time,
+          totalSeconds: totalSec,
+          elapsedSeconds: elapsed,
+          mode,
+          activeSectors: sortedSectors,
+          currentSectorIndex: idx,
+          currentSector: sortedSectors[idx],
+          sectorElapsedSeconds: elapsed - idx * sectorDurSec,
+          sectorDurationSeconds: sectorDurSec,
+        };
+      } else {
+        currentRun = {
+          program: slot.program,
+          startTime: slot.time,
+          totalSeconds: totalSec,
+          elapsedSeconds: elapsed,
+          mode,
+          activeSectors: sortedSectors,
+        };
+      }
       break;
     }
   }
