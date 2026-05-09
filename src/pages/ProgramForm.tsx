@@ -60,6 +60,7 @@ const ProgramForm = () => {
       setDuration(data.duration_minutes);
       setDays(data.days_of_week);
       setWeekPattern(((data as any).week_pattern ?? "every") as WeekPattern);
+      setSectorMode(((data as any).sector_mode ?? "parallel") as SectorMode);
       setSectors(data.sectors);
       setActive(data.active);
       setImagePath(data.image_url);
