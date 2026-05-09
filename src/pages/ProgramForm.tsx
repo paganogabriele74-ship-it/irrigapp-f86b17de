@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { SignedImage } from "@/components/SignedImage";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock } from "lucide-react";
-import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
+import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, SECTOR_MODE_LABELS, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
