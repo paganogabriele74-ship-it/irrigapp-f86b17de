@@ -68,6 +68,13 @@ export const getCurrentWeekLetter = (date = new Date()): "A" | "B" =>
 export const programRunsThisWeek = (pattern: WeekPattern, weekLetter: "A" | "B") =>
   pattern === "every" || pattern === weekLetter;
 
+export type SectorMode = "parallel" | "sequential";
+
+export const SECTOR_MODE_LABELS: Record<SectorMode, string> = {
+  parallel: "Tutti insieme",
+  sequential: "Uno alla volta",
+};
+
 export interface Program {
   id: string;
   user_id: string;
@@ -79,7 +86,13 @@ export interface Program {
   active: boolean;
   image_url: string | null;
   week_pattern: WeekPattern;
+  sector_mode: SectorMode;
   created_at: string;
   updated_at: string;
   program_times?: { id: string; start_time: string; program_id: string }[];
 }
+
+export const getProgramTotalMinutes = (p: Pick<Program, "duration_minutes" | "sectors" | "sector_mode">) =>
+  (p.sector_mode ?? "parallel") === "sequential"
+    ? p.duration_minutes * Math.max(1, p.sectors.length)
+    : p.duration_minutes;
