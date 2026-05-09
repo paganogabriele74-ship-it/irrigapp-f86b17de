@@ -1,0 +1,1 @@
+ALTER TABLE public.programs ADD COLUMN sector_mode text NOT NULL DEFAULT 'parallel';

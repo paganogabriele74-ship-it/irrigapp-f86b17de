@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarClock, Sparkles, Plus, ListTree, Timer, Droplets, Activity } from "lucide-react";
-import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek } from "@/lib/irrigation";
+import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, getProgramTotalMinutes } from "@/lib/irrigation";
 
 interface Slot {
   time: string;
@@ -89,24 +89,51 @@ const Dashboard = () => {
     const [h, m, s] = t.split(":").map(Number);
     return h * 3600 + m * 60 + (s || 0);
   };
-  let currentRun: {
+  type CurrentRun = {
     program: Program;
     startTime: string;
     totalSeconds: number;
     elapsedSeconds: number;
+    mode: "parallel" | "sequential";
     activeSectors: number[];
-  } | null = null;
+    currentSector?: number;
+    currentSectorIndex?: number;
+    sectorElapsedSeconds?: number;
+    sectorDurationSeconds?: number;
+  };
+  let currentRun: CurrentRun | null = null;
   for (const slot of todaySlots) {
     const startSec = toSec(slot.time);
-    const totalSec = slot.program.duration_minutes * 60;
+    const sectorDurSec = slot.program.duration_minutes * 60;
+    const mode = (slot.program.sector_mode ?? "parallel") as "parallel" | "sequential";
+    const totalSec = getProgramTotalMinutes(slot.program) * 60;
     if (nowSeconds >= startSec && nowSeconds < startSec + totalSec) {
-      currentRun = {
-        program: slot.program,
-        startTime: slot.time,
-        totalSeconds: totalSec,
-        elapsedSeconds: nowSeconds - startSec,
-        activeSectors: [...slot.program.sectors].sort((a, b) => a - b),
-      };
+      const elapsed = nowSeconds - startSec;
+      const sortedSectors = [...slot.program.sectors].sort((a, b) => a - b);
+      if (mode === "sequential") {
+        const idx = Math.min(sortedSectors.length - 1, Math.floor(elapsed / sectorDurSec));
+        currentRun = {
+          program: slot.program,
+          startTime: slot.time,
+          totalSeconds: totalSec,
+          elapsedSeconds: elapsed,
+          mode,
+          activeSectors: sortedSectors,
+          currentSectorIndex: idx,
+          currentSector: sortedSectors[idx],
+          sectorElapsedSeconds: elapsed - idx * sectorDurSec,
+          sectorDurationSeconds: sectorDurSec,
+        };
+      } else {
+        currentRun = {
+          program: slot.program,
+          startTime: slot.time,
+          totalSeconds: totalSec,
+          elapsedSeconds: elapsed,
+          mode,
+          activeSectors: sortedSectors,
+        };
+      }
       break;
     }
   }
@@ -160,25 +187,50 @@ const Dashboard = () => {
             </div>
             <div className="font-bold text-lg leading-tight mb-3 truncate">{currentRun.program.name}</div>
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="rounded-lg bg-background/60 p-2.5">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settori attivi</div>
-                <div className="text-xl font-extrabold tabular-nums text-primary leading-tight flex flex-wrap gap-1 mt-1">
-                  {currentRun.activeSectors.map(s => (
-                    <span key={s} className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-md bg-primary text-primary-foreground text-sm">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-lg bg-background/60 p-2.5">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo trascorso</div>
-                <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
-                  {pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)}
-                  <span className="text-sm text-muted-foreground font-medium ml-1">
-                    /{currentRun.program.duration_minutes}m
-                  </span>
-                </div>
-              </div>
+              {currentRun.mode === "sequential" && currentRun.currentSector !== undefined ? (
+                <>
+                  <div className="rounded-lg bg-background/60 p-2.5">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settore attivo</div>
+                    <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                      {currentRun.currentSector}
+                      <span className="text-sm text-muted-foreground font-medium ml-1">
+                        ({(currentRun.currentSectorIndex ?? 0) + 1}/{currentRun.activeSectors.length})
+                      </span>
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-background/60 p-2.5">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo settore</div>
+                    <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                      {pad(Math.floor((currentRun.sectorElapsedSeconds ?? 0) / 60))}:{pad((currentRun.sectorElapsedSeconds ?? 0) % 60)}
+                      <span className="text-sm text-muted-foreground font-medium ml-1">
+                        /{currentRun.program.duration_minutes}m
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="rounded-lg bg-background/60 p-2.5">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settori attivi</div>
+                    <div className="text-xl font-extrabold tabular-nums text-primary leading-tight flex flex-wrap gap-1 mt-1">
+                      {currentRun.activeSectors.map(s => (
+                        <span key={s} className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-md bg-primary text-primary-foreground text-sm">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-background/60 p-2.5">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo trascorso</div>
+                    <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                      {pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)}
+                      <span className="text-sm text-muted-foreground font-medium ml-1">
+                        /{currentRun.program.duration_minutes}m
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs text-muted-foreground tabular-nums">

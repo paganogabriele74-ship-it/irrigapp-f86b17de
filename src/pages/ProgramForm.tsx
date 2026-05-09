@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { SignedImage } from "@/components/SignedImage";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock } from "lucide-react";
-import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
+import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, SECTOR_MODE_LABELS, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +32,7 @@ const ProgramForm = () => {
   const [duration, setDuration] = useState<number>(15);
   const [days, setDays] = useState<number[]>([]);
   const [weekPattern, setWeekPattern] = useState<WeekPattern>("every");
+  const [sectorMode, setSectorMode] = useState<SectorMode>("parallel");
   const [sectors, setSectors] = useState<number[]>([]);
   const [times, setTimes] = useState<string[]>(["08:00"]);
   const [active, setActive] = useState(true);
@@ -59,6 +60,7 @@ const ProgramForm = () => {
       setDuration(data.duration_minutes);
       setDays(data.days_of_week);
       setWeekPattern(((data as any).week_pattern ?? "every") as WeekPattern);
+      setSectorMode(((data as any).sector_mode ?? "parallel") as SectorMode);
       setSectors(data.sectors);
       setActive(data.active);
       setImagePath(data.image_url);
@@ -127,6 +129,7 @@ const ProgramForm = () => {
       active,
       image_url: finalImagePath,
       week_pattern: weekPattern,
+      sector_mode: sectorMode,
     };
 
     let programId = id!;
@@ -241,6 +244,30 @@ const ProgramForm = () => {
                   )}
                 >
                   {WEEK_PATTERN_LABELS[w]}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Sector mode */}
+        <Card className="p-5">
+          <Label className="text-base mb-1 block">Modalità settori</Label>
+          <p className="text-xs text-muted-foreground mb-3">Tutti insieme: i settori partono in parallelo. Uno alla volta: i settori si attivano in sequenza.</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {(Object.keys(SECTOR_MODE_LABELS) as SectorMode[]).map(m => {
+              const sel = sectorMode === m;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setSectorMode(m)}
+                  className={cn(
+                    "py-3 rounded-xl text-sm font-semibold transition-base",
+                    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                  )}
+                >
+                  {SECTOR_MODE_LABELS[m]}
                 </button>
               );
             })}
