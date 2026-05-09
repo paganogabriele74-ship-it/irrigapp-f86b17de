@@ -94,28 +94,18 @@ const Dashboard = () => {
     startTime: string;
     totalSeconds: number;
     elapsedSeconds: number;
-    currentSectorIndex: number;
-    currentSector: number;
-    sectorElapsedSeconds: number;
-    sectorDurationSeconds: number;
+    activeSectors: number[];
   } | null = null;
   for (const slot of todaySlots) {
     const startSec = toSec(slot.time);
-    const sectorDurSec = slot.program.duration_minutes * 60;
-    const totalSec = sectorDurSec * slot.program.sectors.length;
+    const totalSec = slot.program.duration_minutes * 60;
     if (nowSeconds >= startSec && nowSeconds < startSec + totalSec) {
-      const elapsed = nowSeconds - startSec;
-      const idx = Math.floor(elapsed / sectorDurSec);
-      const sortedSectors = [...slot.program.sectors].sort((a, b) => a - b);
       currentRun = {
         program: slot.program,
         startTime: slot.time,
         totalSeconds: totalSec,
-        elapsedSeconds: elapsed,
-        currentSectorIndex: idx,
-        currentSector: sortedSectors[idx],
-        sectorElapsedSeconds: elapsed - idx * sectorDurSec,
-        sectorDurationSeconds: sectorDurSec,
+        elapsedSeconds: nowSeconds - startSec,
+        activeSectors: [...slot.program.sectors].sort((a, b) => a - b),
       };
       break;
     }
