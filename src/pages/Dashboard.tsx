@@ -94,28 +94,18 @@ const Dashboard = () => {
     startTime: string;
     totalSeconds: number;
     elapsedSeconds: number;
-    currentSectorIndex: number;
-    currentSector: number;
-    sectorElapsedSeconds: number;
-    sectorDurationSeconds: number;
+    activeSectors: number[];
   } | null = null;
   for (const slot of todaySlots) {
     const startSec = toSec(slot.time);
-    const sectorDurSec = slot.program.duration_minutes * 60;
-    const totalSec = sectorDurSec * slot.program.sectors.length;
+    const totalSec = slot.program.duration_minutes * 60;
     if (nowSeconds >= startSec && nowSeconds < startSec + totalSec) {
-      const elapsed = nowSeconds - startSec;
-      const idx = Math.floor(elapsed / sectorDurSec);
-      const sortedSectors = [...slot.program.sectors].sort((a, b) => a - b);
       currentRun = {
         program: slot.program,
         startTime: slot.time,
         totalSeconds: totalSec,
-        elapsedSeconds: elapsed,
-        currentSectorIndex: idx,
-        currentSector: sortedSectors[idx],
-        sectorElapsedSeconds: elapsed - idx * sectorDurSec,
-        sectorDurationSeconds: sectorDurSec,
+        elapsedSeconds: nowSeconds - startSec,
+        activeSectors: [...slot.program.sectors].sort((a, b) => a - b),
       };
       break;
     }
@@ -171,18 +161,19 @@ const Dashboard = () => {
             <div className="font-bold text-lg leading-tight mb-3 truncate">{currentRun.program.name}</div>
             <div className="grid grid-cols-2 gap-2 mb-3">
               <div className="rounded-lg bg-background/60 p-2.5">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settore attivo</div>
-                <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
-                  {currentRun.currentSector}
-                  <span className="text-sm text-muted-foreground font-medium ml-1">
-                    ({currentRun.currentSectorIndex + 1}/{currentRun.program.sectors.length})
-                  </span>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settori attivi</div>
+                <div className="text-xl font-extrabold tabular-nums text-primary leading-tight flex flex-wrap gap-1 mt-1">
+                  {currentRun.activeSectors.map(s => (
+                    <span key={s} className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-md bg-primary text-primary-foreground text-sm">
+                      {s}
+                    </span>
+                  ))}
                 </div>
               </div>
               <div className="rounded-lg bg-background/60 p-2.5">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo settore</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo trascorso</div>
                 <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
-                  {pad(Math.floor(currentRun.sectorElapsedSeconds / 60))}:{pad(currentRun.sectorElapsedSeconds % 60)}
+                  {pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)}
                   <span className="text-sm text-muted-foreground font-medium ml-1">
                     /{currentRun.program.duration_minutes}m
                   </span>
