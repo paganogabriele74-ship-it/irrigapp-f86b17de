@@ -249,6 +249,30 @@ const ProgramForm = () => {
             })}
           </div>
         </Card>
+
+        {/* Sector mode */}
+        <Card className="p-5">
+          <Label className="text-base mb-1 block">Modalità settori</Label>
+          <p className="text-xs text-muted-foreground mb-3">Tutti insieme: i settori partono in parallelo. Uno alla volta: i settori si attivano in sequenza.</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {(Object.keys(SECTOR_MODE_LABELS) as SectorMode[]).map(m => {
+              const sel = sectorMode === m;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setSectorMode(m)}
+                  className={cn(
+                    "py-3 rounded-xl text-sm font-semibold transition-base",
+                    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                  )}
+                >
+                  {SECTOR_MODE_LABELS[m]}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
         <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <Label className="text-base">Orari di partenza</Label>
