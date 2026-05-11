@@ -43,7 +43,7 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
                 )}
                 {program.sector_mode === "sequential" && (
                   <span className="ml-1 inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground align-middle">
-                    Sequenza
+                    Uno alla volta
                   </span>
                 )}
               </div>

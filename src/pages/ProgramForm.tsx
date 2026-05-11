@@ -296,10 +296,10 @@ const ProgramForm = () => {
           </div>
 
           <div>
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Settori in</div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Settori:</div>
             <div className="grid grid-cols-2 gap-1.5">
-              <button type="button" onClick={() => setSectorMode("parallel")} className={cn("py-2.5", pill(sectorMode === "parallel"))}>Parallelo</button>
-              <button type="button" onClick={() => setSectorMode("sequential")} className={cn("py-2.5", pill(sectorMode === "sequential"))}>Sequenza</button>
+              <button type="button" onClick={() => setSectorMode("parallel")} className={cn("py-2.5", pill(sectorMode === "parallel"))}>Tutti insieme</button>
+              <button type="button" onClick={() => setSectorMode("sequential")} className={cn("py-2.5", pill(sectorMode === "sequential"))}>Uno alla volta</button>
             </div>
           </div>
         </Card>
