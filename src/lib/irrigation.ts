@@ -49,8 +49,8 @@ export type WeekPattern = "every" | "A" | "B";
 
 export const WEEK_PATTERN_LABELS: Record<WeekPattern, string> = {
   every: "Ogni settimana",
-  A: "Settimana A",
-  B: "Settimana B",
+  A: "Settimana concime",
+  B: "Settimana acido",
 };
 
 // ISO week number → A (odd) / B (even). Used to determine current week parity.

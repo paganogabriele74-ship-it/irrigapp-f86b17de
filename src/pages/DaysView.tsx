@@ -57,7 +57,7 @@ const DaysView = () => {
                 sel ? "gradient-primary text-primary-foreground shadow-soft" : "text-secondary-foreground hover:bg-background/50"
               )}
             >
-              Settimana {w}
+              {w === "A" ? "Settimana concime" : "Settimana acido"}
               {isCurrent && (
                 <span className={cn(
                   "text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase",
