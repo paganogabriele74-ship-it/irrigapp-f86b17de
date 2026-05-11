@@ -38,7 +38,7 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
                 {!program.active && <span className="text-xs text-muted-foreground">Disattivato</span>}
                 {program.week_pattern && program.week_pattern !== "every" && (
                   <span className="ml-1 inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent text-accent-foreground align-middle">
-                    Sett. {program.week_pattern}
+                    Sett. {program.week_pattern === "A" ? "concime" : "acido"}
                   </span>
                 )}
                 {program.sector_mode === "sequential" && (

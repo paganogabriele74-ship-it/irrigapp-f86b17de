@@ -332,8 +332,8 @@ const ProgramForm = () => {
           <div className="grid grid-cols-3 gap-1.5 pt-1">
             {([
               { v: "every" as WeekPattern, l: "Ogni sett." },
-              { v: "A" as WeekPattern, l: "Sett. A" },
-              { v: "B" as WeekPattern, l: "Sett. B" },
+              { v: "A" as WeekPattern, l: "Sett. concime" },
+              { v: "B" as WeekPattern, l: "Sett. acido" },
             ]).map(({ v, l }) => (
               <button key={v} type="button" onClick={() => setWeekPattern(v)} className={cn("py-2 text-xs", pill(weekPattern === v))}>{l}</button>
             ))}
