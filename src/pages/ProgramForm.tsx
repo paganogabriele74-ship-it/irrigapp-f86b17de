@@ -5,13 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { SignedImage } from "@/components/SignedImage";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock } from "lucide-react";
-import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, SECTOR_MODE_LABELS, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
+import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock, Minus } from "lucide-react";
+import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, WeekPattern } from "@/lib/irrigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -115,7 +113,6 @@ const ProgramForm = () => {
         setSaving(false);
         return;
       }
-      // Remove old image if replacing
       if (imagePath) await supabase.storage.from("program-images").remove([imagePath]);
       finalImagePath = path;
     }
@@ -136,7 +133,6 @@ const ProgramForm = () => {
     if (isEdit) {
       const { error } = await supabase.from("programs").update(payload).eq("id", programId);
       if (error) { toast.error("Errore salvataggio"); setSaving(false); return; }
-      // Replace times
       await supabase.from("program_times").delete().eq("program_id", programId);
     } else {
       const { data: created, error } = await supabase.from("programs").insert(payload).select().single();
@@ -171,35 +167,154 @@ const ProgramForm = () => {
     return <AppShell><div className="h-96 animate-pulse rounded-2xl bg-muted" /></AppShell>;
   }
 
+  const totalMinutes = sectorMode === "sequential" ? duration * Math.max(1, sectors.length) : duration;
+
+  // Compact pill button helper styles
+  const pill = (sel: boolean) => cn(
+    "rounded-lg text-sm font-semibold transition-base",
+    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+  );
+
+  const dosageColor: Record<DosageType, string> = {
+    acqua: "bg-water text-water-foreground",
+    concime: "bg-fertilizer text-fertilizer-foreground",
+    acido: "bg-acid text-acid-foreground",
+  };
+
   return (
     <AppShell>
-      <div className="flex items-center gap-2 mb-4">
+      {/* Sticky header */}
+      <div className="sticky top-0 z-10 -mx-4 px-4 py-2 mb-4 bg-background/85 backdrop-blur-md border-b border-border flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="size-5" />
         </Button>
-        <h1 className="text-2xl font-bold">{isEdit ? "Modifica programma" : "Nuovo programma"}</h1>
+        <h1 className="text-lg font-bold flex-1 truncate">{isEdit ? "Modifica" : "Nuovo programma"}</h1>
+        <Button onClick={save} disabled={saving} size="sm">
+          <Save className="size-4" />
+          {saving ? "..." : "Salva"}
+        </Button>
       </div>
 
-      <div className="space-y-5">
-        {/* Name + active */}
-        <Card className="p-5 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nome del programma</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Programma 1" maxLength={60} />
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-base">Attivo</Label>
-              <p className="text-xs text-muted-foreground">I programmi disattivati non compaiono nella vista oggi</p>
+      <div className="space-y-4">
+        {/* Hero: image + name + active */}
+        <Card className="overflow-hidden">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="relative w-full h-32 bg-secondary/40 group"
+          >
+            {imagePreview ? (
+              <img src={imagePreview} alt="" className="w-full h-full object-cover" />
+            ) : imagePath ? (
+              <SignedImage path={imagePath} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                <ImageIcon className="size-6" />
+                <span className="text-xs">Tocca per aggiungere foto</span>
+              </div>
+            )}
+            {(imagePreview || imagePath) && (
+              <span
+                role="button"
+                onClick={(e) => { e.stopPropagation(); removeImage(); }}
+                className="absolute top-2 right-2 inline-flex items-center justify-center rounded-full bg-background/90 size-8 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+              >
+                <Trash2 className="size-4" />
+              </span>
+            )}
+          </button>
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickImage} />
+          <div className="p-4 space-y-3">
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nome programma"
+              maxLength={60}
+              className="text-base font-semibold border-0 px-0 focus-visible:ring-0 shadow-none"
+            />
+            <div className="flex items-center justify-between">
+              <span className={cn("text-xs px-2 py-0.5 rounded-full font-medium", active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>
+                {active ? "Attivo" : "Disattivo"}
+              </span>
+              <Switch checked={active} onCheckedChange={setActive} />
             </div>
-            <Switch checked={active} onCheckedChange={setActive} />
           </div>
         </Card>
 
-        {/* Days */}
-        <Card className="p-5">
-          <Label className="text-base mb-3 block">Giorni della settimana</Label>
-          <div className="grid grid-cols-7 gap-1.5 mb-2">
+        {/* Dosage as colored pills + duration stepper */}
+        <Card className="p-4 space-y-4">
+          <div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Dosaggio</div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(Object.keys(DOSAGE_LABELS) as DosageType[]).map(d => {
+                const sel = dosage === d;
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setDosage(d)}
+                    className={cn("py-2.5 rounded-lg text-sm font-semibold transition-base", sel ? `${dosageColor[d]} shadow-soft` : "bg-secondary text-secondary-foreground hover:bg-secondary/70")}
+                  >
+                    {DOSAGE_LABELS[d]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-baseline justify-between mb-2">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Durata per settore</span>
+              <span className="text-xs text-muted-foreground tabular-nums">Tot: {totalMinutes} min</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="outline" size="icon" onClick={() => setDuration(d => Math.max(1, d - 1))}>
+                <Minus className="size-4" />
+              </Button>
+              <div className="flex-1 relative">
+                <Input
+                  type="number"
+                  min={1}
+                  max={600}
+                  value={duration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                  className="text-center text-lg font-bold tabular-nums"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">min</span>
+              </div>
+              <Button type="button" variant="outline" size="icon" onClick={() => setDuration(d => Math.min(600, d + 1))}>
+                <Plus className="size-4" />
+              </Button>
+            </div>
+            <div className="flex gap-1.5 mt-2">
+              {[5, 10, 15, 20, 30, 45, 60].map(p => (
+                <button key={p} type="button" onClick={() => setDuration(p)} className={cn("flex-1 py-1 rounded-md text-xs font-medium transition-base", duration === p ? "bg-primary text-primary-foreground" : "bg-secondary/60 hover:bg-secondary")}>
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Settori in</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <button type="button" onClick={() => setSectorMode("parallel")} className={cn("py-2.5", pill(sectorMode === "parallel"))}>Parallelo</button>
+              <button type="button" onClick={() => setSectorMode("sequential")} className={cn("py-2.5", pill(sectorMode === "sequential"))}>Sequenza</button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Days + week pattern combined */}
+        <Card className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Giorni</div>
+            <div className="flex gap-1 text-[11px]">
+              <button type="button" onClick={() => setDays([1,2,3,4,5,6,7])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">Tutti</button>
+              <button type="button" onClick={() => setDays([1,2,3,4,5])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">L-V</button>
+              <button type="button" onClick={() => setDays([])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">—</button>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1">
             {DAYS.map(d => {
               const sel = days.includes(d.id);
               return (
@@ -207,123 +322,63 @@ const ProgramForm = () => {
                   key={d.id}
                   type="button"
                   onClick={() => setDays(prev => toggle(prev, d.id))}
-                  className={cn(
-                    "py-3 rounded-xl text-sm font-semibold transition-base",
-                    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
-                  )}
+                  className={cn("py-2.5", pill(sel))}
                 >
-                  {d.short}
+                  {d.short.slice(0,1)}
                 </button>
               );
             })}
           </div>
-          <div className="flex gap-2 text-xs">
-            <button type="button" onClick={() => setDays([1,2,3,4,5,6,7])} className="text-primary hover:underline">Tutti</button>
-            <span className="text-muted-foreground">·</span>
-            <button type="button" onClick={() => setDays([1,2,3,4,5])} className="text-primary hover:underline">Lun-Ven</button>
-            <span className="text-muted-foreground">·</span>
-            <button type="button" onClick={() => setDays([])} className="text-primary hover:underline">Nessuno</button>
+          <div className="grid grid-cols-3 gap-1.5 pt-1">
+            {([
+              { v: "every" as WeekPattern, l: "Ogni sett." },
+              { v: "A" as WeekPattern, l: "Sett. A" },
+              { v: "B" as WeekPattern, l: "Sett. B" },
+            ]).map(({ v, l }) => (
+              <button key={v} type="button" onClick={() => setWeekPattern(v)} className={cn("py-2 text-xs", pill(weekPattern === v))}>{l}</button>
+            ))}
           </div>
         </Card>
 
-        {/* Week pattern */}
-        <Card className="p-5">
-          <Label className="text-base mb-1 block">Frequenza settimanale</Label>
-          <p className="text-xs text-muted-foreground mb-3">Scegli se il programma parte ogni settimana o a settimane alternate (A / B).</p>
-          <div className="grid grid-cols-3 gap-1.5">
-            {(Object.keys(WEEK_PATTERN_LABELS) as WeekPattern[]).map(w => {
-              const sel = weekPattern === w;
-              return (
-                <button
-                  key={w}
-                  type="button"
-                  onClick={() => setWeekPattern(w)}
-                  className={cn(
-                    "py-3 rounded-xl text-sm font-semibold transition-base",
-                    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
-                  )}
-                >
-                  {WEEK_PATTERN_LABELS[w]}
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        {/* Sector mode */}
-        <Card className="p-5">
-          <Label className="text-base mb-1 block">Modalità settori</Label>
-          <p className="text-xs text-muted-foreground mb-3">Tutti insieme: i settori partono in parallelo. Uno alla volta: i settori si attivano in sequenza.</p>
-          <div className="grid grid-cols-2 gap-1.5">
-            {(Object.keys(SECTOR_MODE_LABELS) as SectorMode[]).map(m => {
-              const sel = sectorMode === m;
-              return (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setSectorMode(m)}
-                  className={cn(
-                    "py-3 rounded-xl text-sm font-semibold transition-base",
-                    sel ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
-                  )}
-                >
-                  {SECTOR_MODE_LABELS[m]}
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-        <Card className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <Label className="text-base">Orari di partenza</Label>
-            <Button type="button" size="sm" variant="outline" onClick={addTime}>
-              <Plus className="size-3.5" /> Orario
+        {/* Times - compact chip rows */}
+        <Card className="p-4 space-y-2">
+          <div className="flex items-center justify-between mb-1">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Orari</div>
+            <Button type="button" size="sm" variant="ghost" onClick={addTime} className="h-7 px-2 text-primary">
+              <Plus className="size-3.5" /> Aggiungi
             </Button>
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
             {times.map((t, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                  <Input type="time" value={t} onChange={(e) => updateTime(i, e.target.value)} className="pl-9 tabular-nums" />
-                </div>
+              <div key={i} className="flex items-center gap-1 bg-secondary/60 rounded-lg pr-1">
+                <Clock className="size-3.5 text-muted-foreground ml-2" />
+                <input
+                  type="time"
+                  value={t}
+                  onChange={(e) => updateTime(i, e.target.value)}
+                  className="bg-transparent border-0 outline-none text-sm font-semibold tabular-nums py-1.5 w-[5.5rem]"
+                />
                 {times.length > 1 && (
-                  <Button type="button" size="icon" variant="ghost" onClick={() => removeTime(i)}>
-                    <X className="size-4" />
-                  </Button>
+                  <button type="button" onClick={() => removeTime(i)} className="size-6 inline-flex items-center justify-center rounded hover:bg-background/60">
+                    <X className="size-3.5" />
+                  </button>
                 )}
               </div>
             ))}
           </div>
         </Card>
 
-        {/* Dosage + duration */}
-        <Card className="p-5 space-y-4">
-          <div>
-            <Label className="text-base mb-2 block">Tipo di dosaggio</Label>
-            <Tabs value={dosage} onValueChange={(v) => setDosage(v as DosageType)}>
-              <TabsList className="grid grid-cols-3 w-full">
-                {(Object.keys(DOSAGE_LABELS) as DosageType[]).map(d => (
-                  <TabsTrigger key={d} value={d}>{DOSAGE_LABELS[d]}</TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-            <p className="text-xs text-muted-foreground mt-2">Applicato a tutti i settori del programma.</p>
+        {/* Sectors - compact grid */}
+        <Card className="p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori</div>
+            <div className="flex gap-1 text-[11px]">
+              <span className="text-xs text-muted-foreground mr-1 self-center">{sectors.length}/32</span>
+              <button type="button" onClick={() => setSectors(SECTORS)} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">Tutti</button>
+              <button type="button" onClick={() => setSectors([])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">—</button>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="duration">Durata per settore (minuti)</Label>
-            <Input id="duration" type="number" min={1} max={600} value={duration} onChange={(e) => setDuration(Number(e.target.value))} className="tabular-nums" />
-            <p className="text-xs text-muted-foreground">Una sola durata per tutti i settori.</p>
-          </div>
-        </Card>
-
-        {/* Sectors */}
-        <Card className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <Label className="text-base">Settori (1-32)</Label>
-            <span className="text-xs text-muted-foreground">{sectors.length} selezionati</span>
-          </div>
-          <div className="grid grid-cols-8 gap-1.5 mb-3">
+          <div className="grid grid-cols-8 gap-1">
             {SECTORS.map(s => {
               const sel = sectors.includes(s);
               return (
@@ -332,8 +387,8 @@ const ProgramForm = () => {
                   type="button"
                   onClick={() => setSectors(prev => toggle(prev, s))}
                   className={cn(
-                    "aspect-square rounded-lg text-sm font-semibold tabular-nums transition-base",
-                    sel ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                    "aspect-square rounded-md text-xs font-bold tabular-nums transition-base",
+                    sel ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary/60 text-secondary-foreground hover:bg-secondary"
                   )}
                 >
                   {s}
@@ -341,52 +396,15 @@ const ProgramForm = () => {
               );
             })}
           </div>
-          <div className="flex gap-2 text-xs">
-            <button type="button" onClick={() => setSectors(SECTORS)} className="text-primary hover:underline">Tutti</button>
-            <span className="text-muted-foreground">·</span>
-            <button type="button" onClick={() => setSectors([])} className="text-primary hover:underline">Nessuno</button>
-          </div>
         </Card>
 
-        {/* Image */}
-        <Card className="p-5">
-          <Label className="text-base mb-3 block">Immagine (opzionale)</Label>
-          {imagePreview || imagePath ? (
-            <div className="relative rounded-xl overflow-hidden bg-muted">
-              {imagePreview ? (
-                <img src={imagePreview} alt="" className="w-full h-48 object-cover" />
-              ) : (
-                <SignedImage path={imagePath} className="w-full h-48 object-cover" />
-              )}
-              <Button type="button" variant="destructive" size="sm" className="absolute top-2 right-2" onClick={removeImage}>
-                <Trash2 className="size-3.5" /> Rimuovi
-              </Button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="w-full h-32 rounded-xl border-2 border-dashed border-border hover:border-primary hover:bg-secondary/40 transition-base flex flex-col items-center justify-center gap-2 text-muted-foreground"
-            >
-              <ImageIcon className="size-6" />
-              <span className="text-sm">Aggiungi foto della serra o del settore</span>
-            </button>
-          )}
-          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickImage} />
-        </Card>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-2 pb-4">
-          <Button onClick={save} disabled={saving} size="lg" className="flex-1">
-            <Save className="size-4" />
-            {saving ? "Salvataggio..." : isEdit ? "Salva modifiche" : "Crea programma"}
+        {/* Delete (only edit) */}
+        {isEdit && (
+          <Button onClick={removeProgram} variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
+            <Trash2 className="size-4" /> Elimina programma
           </Button>
-          {isEdit && (
-            <Button onClick={removeProgram} variant="outline" size="lg" className="text-destructive hover:text-destructive">
-              <Trash2 className="size-4" /> Elimina
-            </Button>
-          )}
-        </div>
+        )}
+        <div className="h-4" />
       </div>
     </AppShell>
   );
