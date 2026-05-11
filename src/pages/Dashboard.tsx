@@ -7,13 +7,15 @@ import { ProgramCard } from "@/components/ProgramCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarClock, Sparkles, Plus, ListTree, Timer, Droplets, Activity } from "lucide-react";
+import { CalendarClock, Plus, ListTree, Timer, Activity, Clock } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, getProgramTotalMinutes } from "@/lib/irrigation";
 
 interface Slot {
   time: string;
   program: Program;
 }
+
+const pad = (n: number) => String(n).padStart(2, "0");
 
 const Dashboard = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -41,22 +43,24 @@ const Dashboard = () => {
   const currentWeekLetter = getCurrentWeekLetter(now);
   const activePrograms = programs.filter(p => p.active);
 
-  // Today's slots (filtered by week pattern)
+  const dateLabel = now.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+  const timeLabel = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  // Today's slots
   const todaySlots: Slot[] = [];
   activePrograms
     .filter(p => p.days_of_week.includes(today) && programRunsThisWeek(p.week_pattern ?? "every", currentWeekLetter))
     .forEach(p => p.program_times?.forEach(t => todaySlots.push({ time: t.start_time, program: p })));
   todaySlots.sort((a, b) => a.time.localeCompare(b.time));
 
-  // Next upcoming
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const toMin = (t: string) => {
     const [h, m] = t.split(":").map(Number);
     return h * 60 + m;
   };
 
+  // Next upcoming
   let nextSlot: { day: number; dayLabel: string; time: string; program: Program; offsetDays: number } | null = null;
-  // Look ahead 14 days (to cover A/B alternating weeks)
   for (let offset = 0; offset < 14 && !nextSlot; offset++) {
     const checkDay = ((today - 1 + offset) % 7) + 1;
     const checkDate = new Date(now);
@@ -80,10 +84,9 @@ const Dashboard = () => {
     }
   }
 
-  const currentTimeStr = formatTime(`${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:00`);
   const upcomingTodayHighlight = todaySlots.find(s => toMin(s.time) > nowMinutes)?.time.slice(0, 5);
 
-  // Currently running program (in real time)
+  // Currently running
   const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
   const toSec = (t: string) => {
     const [h, m, s] = t.split(":").map(Number);
@@ -113,32 +116,18 @@ const Dashboard = () => {
       if (mode === "sequential") {
         const idx = Math.min(sortedSectors.length - 1, Math.floor(elapsed / sectorDurSec));
         currentRun = {
-          program: slot.program,
-          startTime: slot.time,
-          totalSeconds: totalSec,
-          elapsedSeconds: elapsed,
-          mode,
-          activeSectors: sortedSectors,
-          currentSectorIndex: idx,
-          currentSector: sortedSectors[idx],
-          sectorElapsedSeconds: elapsed - idx * sectorDurSec,
-          sectorDurationSeconds: sectorDurSec,
+          program: slot.program, startTime: slot.time, totalSeconds: totalSec, elapsedSeconds: elapsed, mode,
+          activeSectors: sortedSectors, currentSectorIndex: idx, currentSector: sortedSectors[idx],
+          sectorElapsedSeconds: elapsed - idx * sectorDurSec, sectorDurationSeconds: sectorDurSec,
         };
       } else {
-        currentRun = {
-          program: slot.program,
-          startTime: slot.time,
-          totalSeconds: totalSec,
-          elapsedSeconds: elapsed,
-          mode,
-          activeSectors: sortedSectors,
-        };
+        currentRun = { program: slot.program, startTime: slot.time, totalSeconds: totalSec, elapsedSeconds: elapsed, mode, activeSectors: sortedSectors };
       }
       break;
     }
   }
 
-  // Compute next slot Date for countdown
+  // Countdown
   let nextSlotDate: Date | null = null;
   if (nextSlot) {
     const [h, m, s] = nextSlot.time.split(":").map(Number);
@@ -147,179 +136,173 @@ const Dashboard = () => {
     target.setDate(target.getDate() + nextSlot.offsetDays);
     nextSlotDate = target;
   }
-
   const diffMs = nextSlotDate ? nextSlotDate.getTime() - now.getTime() : 0;
   const totalSec = Math.max(0, Math.floor(diffMs / 1000));
   const cdDays = Math.floor(totalSec / 86400);
   const cdH = Math.floor((totalSec % 86400) / 3600);
   const cdM = Math.floor((totalSec % 3600) / 60);
   const cdS = totalSec % 60;
-  const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
     <AppShell>
-      <section className="mb-6">
-        <div className="rounded-2xl gradient-fresh p-6 sm:p-8 text-primary-foreground shadow-elevated relative overflow-hidden">
-          <div className="absolute -right-8 -top-8 size-40 rounded-full bg-white/10 blur-2xl" />
-          <div className="relative">
-            <p className="text-sm uppercase tracking-wider opacity-80 mb-1">{todayLabel}</p>
-            <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
-              Benvenuto su IrrigApp.
-            </h1>
-            <p className="text-base sm:text-lg opacity-95 mt-1">Ecco cosa abbiamo in programma oggi! 🌱</p>
+      {/* Hero: data + ora + benvenuto */}
+      <section className="mb-5">
+        <div className="rounded-2xl gradient-fresh p-5 sm:p-7 text-primary-foreground shadow-elevated relative overflow-hidden">
+          <div className="absolute -right-10 -top-10 size-44 rounded-full bg-white/10 blur-2xl" />
+          <div className="relative flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-widest opacity-80 font-semibold">{todayLabel}</p>
+              <p className="text-sm opacity-90 mt-0.5 capitalize">{dateLabel}</p>
+              <h1 className="text-xl sm:text-2xl font-bold leading-tight mt-2">Ciao! 🌱</h1>
+            </div>
+            <div className="text-right shrink-0">
+              <div className="text-3xl sm:text-4xl font-extrabold tabular-nums leading-none font-mono">{timeLabel}</div>
+              <p className="text-[10px] uppercase tracking-widest opacity-80 mt-1">Ora attuale</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Currently running */}
+      {/* Live: in esecuzione */}
       {currentRun && (
-        <section className="mb-6">
-          <Card className="p-5 border-primary/40 bg-gradient-to-br from-primary/15 to-accent/10 shadow-elevated relative overflow-hidden">
-            <div className="absolute top-3 right-3 flex items-center gap-1.5">
-              <span className="relative flex size-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex rounded-full size-2.5 bg-primary" />
-              </span>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary">LIVE</span>
-            </div>
-            <div className="flex items-center gap-2 text-primary font-extrabold text-base mb-2">
-              <Activity className="size-4" /> IN ESECUZIONE ORA
+        <section className="mb-5">
+          <Card className="p-4 border-primary/40 bg-gradient-to-br from-primary/15 to-accent/10 shadow-elevated relative overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-primary font-extrabold text-sm">
+                <Activity className="size-4" /> IN ESECUZIONE
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex size-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full size-2.5 bg-primary" />
+                </span>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary">LIVE</span>
+              </div>
             </div>
             <div className="font-bold text-lg leading-tight mb-3 truncate">{currentRun.program.name}</div>
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              {currentRun.mode === "sequential" && currentRun.currentSector !== undefined ? (
-                <>
-                  <div className="rounded-lg bg-background/60 p-2.5">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settore attivo</div>
-                    <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
-                      {currentRun.currentSector}
-                      <span className="text-sm text-muted-foreground font-medium ml-1">
-                        ({(currentRun.currentSectorIndex ?? 0) + 1}/{currentRun.activeSectors.length})
-                      </span>
-                    </div>
+
+            {currentRun.mode === "sequential" && currentRun.currentSector !== undefined ? (
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="rounded-lg bg-background/60 p-2.5">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settore</div>
+                  <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                    {currentRun.currentSector}
+                    <span className="text-sm text-muted-foreground font-medium ml-1">
+                      ({(currentRun.currentSectorIndex ?? 0) + 1}/{currentRun.activeSectors.length})
+                    </span>
                   </div>
-                  <div className="rounded-lg bg-background/60 p-2.5">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo settore</div>
-                    <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
-                      {pad(Math.floor((currentRun.sectorElapsedSeconds ?? 0) / 60))}:{pad((currentRun.sectorElapsedSeconds ?? 0) % 60)}
-                      <span className="text-sm text-muted-foreground font-medium ml-1">
-                        /{currentRun.program.duration_minutes}m
-                      </span>
-                    </div>
+                </div>
+                <div className="rounded-lg bg-background/60 p-2.5">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo settore</div>
+                  <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
+                    {pad(Math.floor((currentRun.sectorElapsedSeconds ?? 0) / 60))}:{pad((currentRun.sectorElapsedSeconds ?? 0) % 60)}
                   </div>
-                </>
-              ) : (
-                <>
-                  <div className="rounded-lg bg-background/60 p-2.5">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Settori attivi</div>
-                    <div className="text-xl font-extrabold tabular-nums text-primary leading-tight flex flex-wrap gap-1 mt-1">
-                      {currentRun.activeSectors.map(s => (
-                        <span key={s} className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-md bg-primary text-primary-foreground text-sm">
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="rounded-lg bg-background/60 p-2.5">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tempo trascorso</div>
-                    <div className="text-2xl font-extrabold tabular-nums text-primary leading-tight">
-                      {pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)}
-                      <span className="text-sm text-muted-foreground font-medium ml-1">
-                        /{currentRun.program.duration_minutes}m
-                      </span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-lg bg-background/60 p-2.5 mb-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Settori attivi</div>
+                <div className="flex flex-wrap gap-1">
+                  {currentRun.activeSectors.map(s => (
+                    <span key={s} className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-md bg-primary text-primary-foreground text-sm font-bold">
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs text-muted-foreground tabular-nums">
                 <span>Avvio: {formatTime(currentRun.startTime)}</span>
-                <span>
-                  {pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)} / {Math.floor(currentRun.totalSeconds / 60)}m
-                </span>
+                <span>{pad(Math.floor(currentRun.elapsedSeconds / 60))}:{pad(currentRun.elapsedSeconds % 60)} / {Math.floor(currentRun.totalSeconds / 60)}m</span>
               </div>
               <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-1000"
-                  style={{ width: `${Math.min(100, (currentRun.elapsedSeconds / currentRun.totalSeconds) * 100)}%` }}
-                />
+                <div className="h-full bg-primary transition-all duration-1000"
+                  style={{ width: `${Math.min(100, (currentRun.elapsedSeconds / currentRun.totalSeconds) * 100)}%` }} />
               </div>
             </div>
           </Card>
         </section>
       )}
 
-      {/* Countdown to next irrigation */}
-      {nextSlot && nextSlotDate && (
-        <section className="mb-6">
-          <Card className="p-5 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-            <div className="flex items-center justify-between gap-4 mb-3">
-              <div className="flex items-center gap-2 text-muted-foreground font-extrabold text-base">
-                <Timer className="size-4" /> PROSSIMA IRRIGAZIONE
-              </div>
-              <div className="text-muted-foreground truncate text-right text-xs">
-                {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
-              </div>
-            </div>
-            <div className="flex items-end justify-between gap-3">
-              <div className="font-semibold truncate text-base">{nextSlot.program.name}</div>
-              <div className="flex items-center gap-1.5 tabular-nums font-mono text-sm">
-                {cdDays > 0 && (
-                  <div className="flex flex-col items-center">
-                    <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{cdDays}</span>
-                    <span className="text-muted-foreground uppercase text-sm">g</span>
-                  </div>
-                )}
-                <div className="flex flex-col items-center">
-                  <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{pad(cdH)}</span>
-                  <span className="text-muted-foreground uppercase text-sm">h</span>
-                </div>
-                <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
-                <div className="flex flex-col items-center">
-                  <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{pad(cdM)}</span>
-                  <span className="text-muted-foreground uppercase text-sm">m</span>
-                </div>
-                <span className="text-xl sm:text-2xl font-bold text-muted-foreground leading-none">:</span>
-                <div className="flex flex-col items-center">
-                  <span className="sm:text-2xl font-bold leading-none text-primary text-3xl">{pad(cdS)}</span>
-                  <span className="text-muted-foreground uppercase text-sm">s</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </section>
-      )}
-
-      {/* Stats */}
-      <section className="grid grid-cols-2 gap-3 mb-6">
-        <Card className="p-4">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <CalendarClock className="size-4" /> OGGI
+      {/* Stats compatte */}
+      <section className="grid grid-cols-3 gap-2 mb-5">
+        <Card className="p-3">
+          <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
+            <CalendarClock className="size-3.5" /> Oggi
           </div>
-          <div className="text-2xl font-bold tabular-nums">{todaySlots.length}</div>
-          <div className="text-xs text-muted-foreground">irrigazioni</div>
+          <div className="text-2xl font-extrabold tabular-nums leading-none">{todaySlots.length}</div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">irrigazioni</div>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <ListTree className="size-4" /> ATTIVI
+        <Card className="p-3">
+          <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
+            <ListTree className="size-3.5" /> Attivi
           </div>
-          <div className="text-2xl font-bold tabular-nums">{activePrograms.length}</div>
-          <div className="text-xs text-muted-foreground">programmi totali</div>
+          <div className="text-2xl font-extrabold tabular-nums leading-none">{activePrograms.length}</div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">programmi</div>
+        </Card>
+        <Card className="p-3">
+          <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
+            <Clock className="size-3.5" /> Sett.
+          </div>
+          <div className="text-2xl font-extrabold tabular-nums leading-none uppercase">{currentWeekLetter === "A" ? "C" : "A"}</div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">{currentWeekLetter === "A" ? "concime" : "acido"}</div>
         </Card>
       </section>
 
-      {/* Today list */}
+      {/* Prossima irrigazione */}
+      {nextSlot && nextSlotDate && (
+        <section className="mb-5">
+          <Card className="p-4 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-muted-foreground font-extrabold text-xs uppercase tracking-wider">
+                <Timer className="size-3.5" /> Prossima
+              </div>
+              <span className="text-xs text-muted-foreground tabular-nums">{nextSlot.dayLabel} · {formatTime(nextSlot.time)}</span>
+            </div>
+            <div className="font-semibold truncate text-base mb-2">{nextSlot.program.name}</div>
+            <div className="flex items-center justify-center gap-1.5 tabular-nums font-mono">
+              {cdDays > 0 && (
+                <div className="flex flex-col items-center px-2">
+                  <span className="text-2xl font-extrabold leading-none text-primary">{cdDays}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase mt-0.5">giorni</span>
+                </div>
+              )}
+              <div className="flex flex-col items-center px-2">
+                <span className="text-2xl font-extrabold leading-none text-primary">{pad(cdH)}</span>
+                <span className="text-[10px] text-muted-foreground uppercase mt-0.5">ore</span>
+              </div>
+              <span className="text-2xl font-extrabold text-muted-foreground/40 leading-none">:</span>
+              <div className="flex flex-col items-center px-2">
+                <span className="text-2xl font-extrabold leading-none text-primary">{pad(cdM)}</span>
+                <span className="text-[10px] text-muted-foreground uppercase mt-0.5">min</span>
+              </div>
+              <span className="text-2xl font-extrabold text-muted-foreground/40 leading-none">:</span>
+              <div className="flex flex-col items-center px-2">
+                <span className="text-2xl font-extrabold leading-none text-primary">{pad(cdS)}</span>
+                <span className="text-[10px] text-muted-foreground uppercase mt-0.5">sec</span>
+              </div>
+            </div>
+          </Card>
+        </section>
+      )}
+
+      {/* Programma di oggi */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold">Programma di oggi</h2>
-          <span className="text-muted-foreground tabular-nums text-base">Ora: {currentTimeStr}</span>
+          <h2 className="text-lg font-bold">Oggi</h2>
+          {todaySlots.length > 0 && (
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/programmi"><Plus className="size-4" /> Nuovo</Link>
+            </Button>
+          )}
         </div>
 
         {loading ? (
           <div className="space-y-3">
-            <Skeleton className="h-28 w-full rounded-xl" />
-            <Skeleton className="h-28 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
           </div>
         ) : todaySlots.length === 0 ? (
           <Card className="p-8 text-center border-dashed">
@@ -329,11 +312,11 @@ const Dashboard = () => {
             </Button>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {todaySlots.map((slot, i) => (
-              <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex flex-col gap-2 sm:flex-row sm:gap-3">
-                <div className="self-start rounded-lg bg-primary px-3 py-1.5 shadow-soft sm:w-16 sm:shrink-0 sm:bg-transparent sm:px-0 sm:py-3 sm:shadow-none">
-                  <div className="text-lg font-extrabold tabular-nums leading-none text-primary-foreground sm:text-primary sm:text-lg">{formatTime(slot.time)}</div>
+              <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex gap-3">
+                <div className="shrink-0 flex flex-col items-center justify-center rounded-lg bg-primary/10 px-2.5 py-2 w-16">
+                  <div className="text-base font-extrabold tabular-nums leading-none text-primary">{formatTime(slot.time)}</div>
                 </div>
                 <div className="min-w-0 flex-1">
                   <ProgramCard program={slot.program} highlightTime={upcomingTodayHighlight} compact />
