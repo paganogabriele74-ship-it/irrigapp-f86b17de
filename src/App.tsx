@@ -8,6 +8,7 @@ import DaysView from "./pages/DaysView";
 import ProgramsList from "./pages/ProgramsList";
 import ProgramForm from "./pages/ProgramForm";
 import NotFound from "./pages/NotFound";
+import ProgramsGuard from "./components/ProgramsGuard";
 
 const queryClient = new QueryClient();
 
@@ -21,9 +22,9 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/giorni" element={<DaysView />} />
           <Route path="/giorni/:day" element={<DaysView />} />
-          <Route path="/programmi" element={<ProgramsList />} />
-          <Route path="/programmi/nuovo" element={<ProgramForm />} />
-          <Route path="/programmi/:id" element={<ProgramForm />} />
+          <Route path="/programmi" element={<ProgramsGuard><ProgramsList /></ProgramsGuard>} />
+          <Route path="/programmi/nuovo" element={<ProgramsGuard><ProgramForm /></ProgramsGuard>} />
+          <Route path="/programmi/:id" element={<ProgramsGuard><ProgramForm /></ProgramsGuard>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
