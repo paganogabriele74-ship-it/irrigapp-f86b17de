@@ -319,7 +319,7 @@ const Dashboard = () => {
                   <div className="text-base font-extrabold tabular-nums leading-none text-primary">{formatTime(slot.time)}</div>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <ProgramCard program={slot.program} highlightTime={upcomingTodayHighlight} compact />
+                  <ProgramCard program={slot.program} highlightTime={upcomingTodayHighlight} compact readonly />
                 </div>
               </div>
             ))}

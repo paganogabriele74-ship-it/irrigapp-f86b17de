@@ -10,13 +10,17 @@ interface Props {
   program: Program;
   highlightTime?: string;
   compact?: boolean;
+  readonly?: boolean;
 }
 
-export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
+export const ProgramCard = ({ program, highlightTime, compact, readonly }: Props) => {
   const times = (program.program_times ?? []).map(t => t.start_time).sort();
 
+  const Wrapper: any = readonly ? "div" : Link;
+  const wrapperProps = readonly ? { className: "block" } : { to: `/programmi/${program.id}`, className: "block group" };
+
   return (
-    <Link to={`/programmi/${program.id}`} className="block group">
+    <Wrapper {...wrapperProps}>
       <Card className={cn(
         "overflow-hidden border-border/60 shadow-soft hover:shadow-elevated transition-base",
         compact && "border-primary/15",
@@ -85,6 +89,6 @@ export const ProgramCard = ({ program, highlightTime, compact }: Props) => {
           </div>
         </div>
       </Card>
-    </Link>
+    </Wrapper>
   );
 };

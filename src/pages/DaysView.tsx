@@ -131,7 +131,7 @@ const DaysView = () => {
                 <div className="text-lg font-bold tabular-nums">{formatTime(slot.time)}</div>
               </div>
               <div className="flex-1">
-                <ProgramCard program={slot.program} compact />
+                <ProgramCard program={slot.program} compact readonly />
               </div>
             </div>
           ))}
