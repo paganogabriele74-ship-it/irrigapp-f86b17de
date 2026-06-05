@@ -89,6 +89,6 @@ export const ProgramCard = ({ program, highlightTime, compact, readonly }: Props
           </div>
         </div>
       </Card>
-    </Link>
+    </Wrapper>
   );
 };
