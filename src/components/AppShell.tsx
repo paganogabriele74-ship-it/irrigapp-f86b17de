@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Sprout, LayoutDashboard, ListTree, Plus, CalendarDays } from "lucide-react";
+import { LayoutDashboard, ListTree, Plus, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +19,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
       <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border/60">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           <Link to="/" className="flex items-center gap-2">
-            <div className="size-8 rounded-xl gradient-primary flex items-center justify-center shadow-soft">
-              <Sprout className="size-5 text-primary-foreground" />
-            </div>
+            <img src="/logo.jpg" alt="IrrigApp" className="size-9 rounded-full shadow-soft object-cover" />
             <span className="font-bold text-lg tracking-tight">IrrigApp</span>
           </Link>
 
