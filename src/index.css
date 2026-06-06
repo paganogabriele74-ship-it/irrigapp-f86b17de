@@ -2,38 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-/* IrrigApp Design System — Verde natura, fresco e pulito.
+/* IrrigApp Design System — Acqua fresca, irrigazione.
    Tutti i colori in HSL. */
 
 @layer base {
   :root {
-    --background: 90 30% 98%;
-    --foreground: 150 30% 12%;
+    --background: 200 50% 98%;
+    --foreground: 205 45% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 150 30% 12%;
+    --card-foreground: 205 45% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 30% 12%;
+    --popover-foreground: 205 45% 12%;
 
-    /* Primary: Foglia profonda */
-    --primary: 145 55% 32%;
-    --primary-foreground: 90 30% 98%;
-    --primary-glow: 142 65% 45%;
+    /* Primary: Acqua / cielo del logo */
+    --primary: 200 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 195 90% 65%;
 
-    /* Secondary: Verde salvia chiaro */
-    --secondary: 130 35% 92%;
-    --secondary-foreground: 150 35% 18%;
+    /* Secondary: Azzurro chiarissimo */
+    --secondary: 200 60% 93%;
+    --secondary-foreground: 205 50% 18%;
 
-    --muted: 100 20% 94%;
-    --muted-foreground: 150 12% 40%;
+    --muted: 200 40% 95%;
+    --muted-foreground: 205 15% 42%;
 
-    /* Accent: Acqua fresca */
-    --accent: 190 75% 45%;
+    /* Accent: Verde foglia (richiamo logo) */
+    --accent: 145 55% 42%;
     --accent-foreground: 0 0% 100%;
 
     /* Dosaggio: acqua / concime / acido */
-    --water: 200 80% 50%;
+    --water: 200 85% 55%;
     --water-foreground: 0 0% 100%;
     --fertilizer: 30 85% 50%;
     --fertilizer-foreground: 0 0% 100%;
@@ -43,51 +43,51 @@
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 130 20% 88%;
-    --input: 130 20% 88%;
-    --ring: 145 55% 32%;
+    --border: 200 35% 88%;
+    --input: 200 35% 88%;
+    --ring: 200 85% 55%;
 
     --radius: 0.875rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(145 55% 32%), hsl(160 60% 42%));
-    --gradient-fresh: linear-gradient(135deg, hsl(145 55% 32%) 0%, hsl(190 75% 45%) 100%);
-    --gradient-soft: linear-gradient(180deg, hsl(90 40% 97%) 0%, hsl(130 35% 94%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(200 85% 55%), hsl(190 90% 60%));
+    --gradient-fresh: linear-gradient(135deg, hsl(200 85% 55%) 0%, hsl(175 70% 55%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(200 60% 98%) 0%, hsl(195 55% 94%) 100%);
 
     /* Shadows */
-    --shadow-soft: 0 2px 12px -4px hsl(145 40% 25% / 0.08);
-    --shadow-elevated: 0 12px 32px -12px hsl(145 50% 25% / 0.18);
-    --shadow-glow: 0 0 24px hsl(142 65% 45% / 0.25);
+    --shadow-soft: 0 2px 12px -4px hsl(200 60% 30% / 0.10);
+    --shadow-elevated: 0 12px 32px -12px hsl(200 70% 30% / 0.20);
+    --shadow-glow: 0 0 24px hsl(195 90% 60% / 0.30);
 
     --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 90 30% 98%;
-    --sidebar-foreground: 150 30% 18%;
-    --sidebar-primary: 145 55% 32%;
-    --sidebar-primary-foreground: 90 30% 98%;
-    --sidebar-accent: 130 35% 92%;
-    --sidebar-accent-foreground: 150 35% 18%;
-    --sidebar-border: 130 20% 88%;
-    --sidebar-ring: 145 55% 32%;
+    --sidebar-background: 200 50% 98%;
+    --sidebar-foreground: 205 45% 18%;
+    --sidebar-primary: 200 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 200 60% 93%;
+    --sidebar-accent-foreground: 205 50% 18%;
+    --sidebar-border: 200 35% 88%;
+    --sidebar-ring: 200 85% 55%;
   }
 
   .dark {
-    --background: 150 25% 8%;
-    --foreground: 90 20% 95%;
-    --card: 150 25% 11%;
-    --card-foreground: 90 20% 95%;
-    --popover: 150 25% 11%;
-    --popover-foreground: 90 20% 95%;
-    --primary: 142 60% 50%;
-    --primary-foreground: 150 30% 10%;
-    --primary-glow: 142 70% 60%;
-    --secondary: 150 20% 18%;
-    --secondary-foreground: 90 20% 95%;
-    --muted: 150 18% 16%;
-    --muted-foreground: 150 10% 65%;
-    --accent: 190 70% 55%;
-    --accent-foreground: 150 30% 10%;
-    --water: 200 80% 60%;
+    --background: 205 45% 8%;
+    --foreground: 200 30% 95%;
+    --card: 205 40% 11%;
+    --card-foreground: 200 30% 95%;
+    --popover: 205 40% 11%;
+    --popover-foreground: 200 30% 95%;
+    --primary: 195 85% 60%;
+    --primary-foreground: 205 50% 10%;
+    --primary-glow: 190 90% 70%;
+    --secondary: 205 30% 18%;
+    --secondary-foreground: 200 30% 95%;
+    --muted: 205 25% 16%;
+    --muted-foreground: 200 15% 65%;
+    --accent: 145 55% 50%;
+    --accent-foreground: 0 0% 100%;
+    --water: 195 85% 60%;
     --water-foreground: 0 0% 100%;
     --fertilizer: 30 85% 60%;
     --fertilizer-foreground: 0 0% 10%;
@@ -95,23 +95,23 @@
     --acid-foreground: 0 0% 100%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 150 18% 20%;
-    --input: 150 18% 20%;
-    --ring: 142 60% 50%;
-    --gradient-primary: linear-gradient(135deg, hsl(142 60% 40%), hsl(160 65% 45%));
-    --gradient-fresh: linear-gradient(135deg, hsl(142 60% 40%) 0%, hsl(190 70% 50%) 100%);
-    --gradient-soft: linear-gradient(180deg, hsl(150 25% 10%) 0%, hsl(150 22% 14%) 100%);
+    --border: 205 25% 20%;
+    --input: 205 25% 20%;
+    --ring: 195 85% 60%;
+    --gradient-primary: linear-gradient(135deg, hsl(200 80% 45%), hsl(190 85% 55%));
+    --gradient-fresh: linear-gradient(135deg, hsl(200 80% 45%) 0%, hsl(175 70% 50%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(205 45% 10%) 0%, hsl(205 40% 14%) 100%);
     --shadow-soft: 0 2px 12px -4px hsl(0 0% 0% / 0.4);
     --shadow-elevated: 0 12px 32px -12px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 24px hsl(142 70% 50% / 0.35);
-    --sidebar-background: 150 25% 10%;
-    --sidebar-foreground: 90 20% 95%;
-    --sidebar-primary: 142 60% 50%;
-    --sidebar-primary-foreground: 150 30% 10%;
-    --sidebar-accent: 150 20% 18%;
-    --sidebar-accent-foreground: 90 20% 95%;
-    --sidebar-border: 150 18% 20%;
-    --sidebar-ring: 142 60% 50%;
+    --shadow-glow: 0 0 24px hsl(195 85% 60% / 0.35);
+    --sidebar-background: 205 45% 10%;
+    --sidebar-foreground: 200 30% 95%;
+    --sidebar-primary: 195 85% 60%;
+    --sidebar-primary-foreground: 205 50% 10%;
+    --sidebar-accent: 205 30% 18%;
+    --sidebar-accent-foreground: 200 30% 95%;
+    --sidebar-border: 205 25% 20%;
+    --sidebar-ring: 195 85% 60%;
   }
 }
 
