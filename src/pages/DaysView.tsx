@@ -124,47 +124,17 @@ const DaysView = () => {
           </Button>
         </Card>
       ) : (
-        <div className="relative space-y-4">
-          {/* Vertical timeline line */}
-          <div className="absolute left-[70px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-primary/50 via-border to-border" aria-hidden />
-
-          {slots.map((slot, i) => {
-            const prev = i > 0 ? slots[i - 1].time : null;
-            const gapMin = prev
-              ? (Number(slot.time.slice(0, 2)) * 60 + Number(slot.time.slice(3, 5))) -
-                (Number(prev.slice(0, 2)) * 60 + Number(prev.slice(3, 5)))
-              : 0;
-            const gapLabel = gapMin >= 60
-              ? `${Math.floor(gapMin / 60)}h${gapMin % 60 ? ` ${gapMin % 60}m` : ""}`
-              : `${gapMin}m`;
-            return (
-              <div key={`${slot.program.id}-${slot.time}-${i}`} className="relative">
-                {prev && gapMin > 0 && (
-                  <div className="flex items-center gap-2 ml-[78px] mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-                    <span className="h-px flex-1 bg-border" />
-                    <span>+{gapLabel}</span>
-                    <span className="h-px flex-1 bg-border" />
-                  </div>
-                )}
-                <div className="flex items-start gap-3">
-                  <div className="w-16 shrink-0 pt-2 text-right">
-                    <div className="text-lg font-bold tabular-nums leading-none text-foreground">
-                      {formatTime(slot.time)}
-                    </div>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
-                      {slot.program.duration_minutes}m
-                    </div>
-                  </div>
-                  <div className="relative pt-3 shrink-0">
-                    <div className="size-3.5 rounded-full bg-primary ring-4 ring-background shadow-glow" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <ProgramCard program={slot.program} compact readonly />
-                  </div>
-                </div>
+        <div className="space-y-3">
+          {slots.map((slot, i) => (
+            <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex gap-3">
+              <div className="w-16 shrink-0 pt-3">
+                <div className="text-lg font-bold tabular-nums">{formatTime(slot.time)}</div>
               </div>
-            );
-          })}
+              <div className="flex-1">
+                <ProgramCard program={slot.program} compact readonly />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
