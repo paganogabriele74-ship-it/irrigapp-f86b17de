@@ -50,6 +50,8 @@ const Dashboard = () => {
 
   const dateLabel = now.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
   const timeLabel = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Buongiorno!" : hour < 18 ? "Buon pomeriggio!" : "Buonasera!";
 
   // Today's slots
   const todaySlots: Slot[] = [];
