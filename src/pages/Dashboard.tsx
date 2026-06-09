@@ -233,62 +233,75 @@ const Dashboard = () => {
         </section>
       )}
 
-      {/* Stats compatte */}
-      <section className="grid grid-cols-3 gap-2 mb-5">
-        <Card className="p-3">
-          <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
-            <CalendarClock className="size-3.5" /> Oggi
+      {/* Settimana corrente */}
+      <section className="mb-5">
+        <Card className={cn(
+          "p-4 flex items-center justify-between gap-3 border-0 shadow-elevated relative overflow-hidden",
+          currentWeekLetter === "A"
+            ? "bg-gradient-to-r from-fertilizer/90 to-fertilizer text-fertilizer-foreground"
+            : "bg-gradient-to-r from-acid/90 to-acid text-acid-foreground"
+        )}>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="size-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <FlaskConical className="size-6" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Settimana in corso</p>
+              <p className="text-xl font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
+            </div>
           </div>
-          <div className="text-2xl font-extrabold tabular-nums leading-none">{todaySlots.length}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">irrigazioni</div>
-        </Card>
-        <Card className="p-3">
-          <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
-            <ListTree className="size-3.5" /> Attivi
+          <div className="text-right shrink-0">
+            <div className="text-3xl font-extrabold leading-none opacity-90">{currentWeekLetter === "A" ? "C" : "A"}</div>
           </div>
-          <div className="text-2xl font-extrabold tabular-nums leading-none">{activePrograms.length}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">programmi</div>
-        </Card>
-        <Card className="p-3">
-          <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
-            <Clock className="size-3.5" /> Sett.
-          </div>
-          <div className="text-2xl font-extrabold tabular-nums leading-none uppercase">{currentWeekLetter === "A" ? "C" : "A"}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">{currentWeekLetter === "A" ? "concime" : "acido"}</div>
         </Card>
       </section>
 
-      {/* Prossima irrigazione */}
+      {/* Prossima irrigazione - countdown moderno */}
       {nextSlot && nextSlotDate && (
         <section className="mb-5">
-          <Card className="p-4 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-muted-foreground font-extrabold text-xs uppercase tracking-wider">
-                <Timer className="size-3.5" /> Prossima
-              </div>
-              <span className="text-xs text-muted-foreground tabular-nums">{nextSlot.dayLabel} · {formatTime(nextSlot.time)}</span>
-            </div>
-            <div className="font-semibold truncate text-base mb-2">{nextSlot.program.name}</div>
-            <div className="flex items-center justify-center gap-1.5 tabular-nums font-mono">
-              {cdDays > 0 && (
-                <div className="flex flex-col items-center px-2">
-                  <span className="text-2xl font-extrabold leading-none text-primary">{cdDays}</span>
-                  <span className="text-[10px] text-muted-foreground uppercase mt-0.5">giorni</span>
+          <Card className="p-5 border-0 shadow-elevated bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground relative overflow-hidden">
+            <div className="absolute -right-16 -bottom-16 size-56 rounded-full bg-white/10 blur-3xl" />
+            <div className="absolute -left-10 -top-10 size-32 rounded-full bg-white/5 blur-2xl" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2 font-extrabold text-xs uppercase tracking-widest opacity-90">
+                  <Timer className="size-4" /> Prossima irrigazione
                 </div>
-              )}
-              <div className="flex flex-col items-center px-2">
-                <span className="text-2xl font-extrabold leading-none text-primary">{pad(cdH)}</span>
-                <span className="text-[10px] text-muted-foreground uppercase mt-0.5">ore</span>
+                <span className="text-xs font-semibold tabular-nums opacity-90">{nextSlot.dayLabel} · {formatTime(nextSlot.time)}</span>
               </div>
-              <span className="text-2xl font-extrabold text-muted-foreground/40 leading-none">:</span>
-              <div className="flex flex-col items-center px-2">
-                <span className="text-2xl font-extrabold leading-none text-primary">{pad(cdM)}</span>
-                <span className="text-[10px] text-muted-foreground uppercase mt-0.5">min</span>
-              </div>
-              <span className="text-2xl font-extrabold text-muted-foreground/40 leading-none">:</span>
-              <div className="flex flex-col items-center px-2">
-                <span className="text-2xl font-extrabold leading-none text-primary">{pad(cdS)}</span>
-                <span className="text-[10px] text-muted-foreground uppercase mt-0.5">sec</span>
+              <div className="font-bold text-lg truncate mb-4 opacity-95">{nextSlot.program.name}</div>
+              <div className="flex items-end justify-center gap-2 sm:gap-3 tabular-nums font-mono">
+                {cdDays > 0 && (
+                  <>
+                    <div className="flex flex-col items-center">
+                      <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
+                        <span className="text-4xl sm:text-5xl font-extrabold leading-none">{cdDays}</span>
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">giorni</span>
+                    </div>
+                    <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
+                  </>
+                )}
+                <div className="flex flex-col items-center">
+                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
+                    <span className="text-4xl sm:text-5xl font-extrabold leading-none">{pad(cdH)}</span>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">ore</span>
+                </div>
+                <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
+                <div className="flex flex-col items-center">
+                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
+                    <span className="text-4xl sm:text-5xl font-extrabold leading-none">{pad(cdM)}</span>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">min</span>
+                </div>
+                <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
+                <div className="flex flex-col items-center">
+                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
+                    <span className="text-4xl sm:text-5xl font-extrabold leading-none tabular-nums">{pad(cdS)}</span>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">sec</span>
+                </div>
               </div>
             </div>
           </Card>
@@ -297,13 +310,71 @@ const Dashboard = () => {
 
       {/* Programma di oggi */}
       <section>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 gap-2">
           <h2 className="text-lg font-bold">Oggi</h2>
-          {todaySlots.length > 0 && (
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/programmi"><Plus className="size-4" /> Nuovo</Link>
-            </Button>
-          )}
+          <div className="flex items-center gap-1">
+            {todaySlots.length > 0 && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <SlidersHorizontal className="size-4" />
+                    Filtra
+                    {activeFilterCount > 0 && (
+                      <span className="ml-0.5 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-72 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold">Filtri</p>
+                    {activeFilterCount > 0 && (
+                      <Button variant="ghost" size="sm" className="h-7 px-2 text-xs"
+                        onClick={() => { setFilterTime("all"); setFilterSector("all"); setFilterProgram("all"); }}>
+                        <X className="size-3" /> Azzera
+                      </Button>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">Orario</label>
+                    <Select value={filterTime} onValueChange={setFilterTime}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tutti gli orari</SelectItem>
+                        {uniqueTimes.map(t => <SelectItem key={t} value={t}>{formatTime(t)}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">Settore</label>
+                    <Select value={filterSector} onValueChange={setFilterSector}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tutti i settori</SelectItem>
+                        {uniqueSectors.map(s => <SelectItem key={s} value={String(s)}>Settore {s}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">Programma</label>
+                    <Select value={filterProgram} onValueChange={setFilterProgram}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tutti i programmi</SelectItem>
+                        {uniquePrograms.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+            {todaySlots.length > 0 && (
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/programmi"><Plus className="size-4" /> Nuovo</Link>
+              </Button>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -318,9 +389,13 @@ const Dashboard = () => {
               <Link to="/programmi/nuovo"><Plus className="size-4" /> Crea il primo programma</Link>
             </Button>
           </Card>
+        ) : filteredSlots.length === 0 ? (
+          <Card className="p-8 text-center border-dashed">
+            <p className="text-muted-foreground">Nessuna irrigazione corrisponde ai filtri.</p>
+          </Card>
         ) : (
           <div className="space-y-3">
-            {todaySlots.map((slot, i) => (
+            {filteredSlots.map((slot, i) => (
               <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex gap-3">
                 <div className="shrink-0 flex flex-col items-center justify-center rounded-lg bg-primary/10 px-2.5 py-2 w-16">
                   <div className="text-base font-extrabold tabular-nums leading-none text-primary">{formatTime(slot.time)}</div>
