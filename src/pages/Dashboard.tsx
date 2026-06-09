@@ -61,6 +61,26 @@ const Dashboard = () => {
     .forEach(p => p.program_times?.forEach(t => todaySlots.push({ time: t.start_time, program: p })));
   todaySlots.sort((a, b) => a.time.localeCompare(b.time));
 
+  // Filter options & filtered slots
+  const uniqueTimes = useMemo(() => Array.from(new Set(todaySlots.map(s => s.time))).sort(), [todaySlots]);
+  const uniqueSectors = useMemo(() => {
+    const set = new Set<number>();
+    todaySlots.forEach(s => s.program.sectors.forEach(n => set.add(n)));
+    return Array.from(set).sort((a, b) => a - b);
+  }, [todaySlots]);
+  const uniquePrograms = useMemo(() => {
+    const map = new Map<string, Program>();
+    todaySlots.forEach(s => map.set(s.program.id, s.program));
+    return Array.from(map.values());
+  }, [todaySlots]);
+  const filteredSlots = todaySlots.filter(s =>
+    (filterTime === "all" || s.time === filterTime) &&
+    (filterSector === "all" || s.program.sectors.includes(Number(filterSector))) &&
+    (filterProgram === "all" || s.program.id === filterProgram)
+  );
+  const activeFilterCount =
+    (filterTime !== "all" ? 1 : 0) + (filterSector !== "all" ? 1 : 0) + (filterProgram !== "all" ? 1 : 0);
+
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const toMin = (t: string) => {
     const [h, m] = t.split(":").map(Number);
