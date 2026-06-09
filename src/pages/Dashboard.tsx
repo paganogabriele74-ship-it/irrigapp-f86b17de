@@ -23,6 +23,9 @@ const Dashboard = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => new Date());
+  const [filterTime, setFilterTime] = useState<string>("all");
+  const [filterSector, setFilterSector] = useState<string>("all");
+  const [filterProgram, setFilterProgram] = useState<string>("all");
 
   useEffect(() => {
     (async () => {
