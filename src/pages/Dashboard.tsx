@@ -158,7 +158,7 @@ const Dashboard = () => {
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-widest opacity-80 font-semibold">{todayLabel}</p>
               <p className="text-sm opacity-90 mt-0.5 capitalize">{dateLabel}</p>
-              <h1 className="text-xl sm:text-2xl font-bold leading-tight mt-2">Ciao! 🌱</h1>
+              <h1 className="text-xl sm:text-2xl font-bold leading-tight mt-2">{greeting} 🌱</h1>
             </div>
             <div className="text-right shrink-0">
               <div className="text-3xl sm:text-4xl font-extrabold tabular-nums leading-none font-mono">{timeLabel}</div>
