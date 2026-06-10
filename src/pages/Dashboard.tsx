@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Timer, Activity, SlidersHorizontal, X, FlaskConical } from "lucide-react";
+import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, getProgramTotalMinutes } from "@/lib/irrigation";
 import { cn } from "@/lib/utils";
 
@@ -264,7 +264,7 @@ const Dashboard = () => {
         )}>
           <div className="flex items-center gap-3 min-w-0">
             <div className="size-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-              <FlaskConical className="size-6" />
+              <Droplets className="size-6" />
             </div>
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Settimana in corso</p>
