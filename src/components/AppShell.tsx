@@ -21,7 +21,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
           <Link to="/" className="flex items-center gap-2.5 min-w-0">
             <img src="/logo.jpg" alt="IrrigApp" className="size-10 rounded-full shadow-soft object-cover shrink-0" />
-            <img src={wordmark.url} alt="IrrigApp" className="h-9 w-auto object-contain" />
+            <img src={wordmark.url} alt="IrrigApp" className="h-7 w-auto object-contain" />
           </Link>
 
           {/* Desktop nav */}
