@@ -55,8 +55,8 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="size-5" />
+                <Button variant="outline" size="icon" className="md:hidden">
+                  <Menu className="size-6" />
                   <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
