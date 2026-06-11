@@ -11,6 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, getProgramTotalMinutes } from "@/lib/irrigation";
+import { findConflicts } from "@/lib/conflicts";
+import { ConflictBanner } from "@/components/ConflictBanner";
 import { cn } from "@/lib/utils";
 
 interface Slot {
