@@ -268,28 +268,6 @@ const Dashboard = () => {
         </section>
       )}
 
-      {/* Settimana corrente */}
-      <section className="mb-5">
-        <Card className={cn(
-          "p-4 flex items-center justify-between gap-3 border-0 shadow-elevated relative overflow-hidden",
-          currentWeekLetter === "A"
-            ? "bg-gradient-to-r from-fertilizer/90 to-fertilizer text-fertilizer-foreground"
-            : "bg-gradient-to-r from-acid/90 to-acid text-acid-foreground"
-        )}>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="size-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-              <Droplets className="size-6" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Settimana in corso</p>
-              <p className="text-xl font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
-            </div>
-          </div>
-          <div className="text-right shrink-0">
-            <div className="text-3xl font-extrabold leading-none opacity-90">{currentWeekLetter === "A" ? "C" : "A"}</div>
-          </div>
-        </Card>
-      </section>
 
       {/* Prossima irrigazione - countdown moderno */}
       {nextSlot && nextSlotDate && (
