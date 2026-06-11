@@ -74,15 +74,30 @@ const ProgramsList = () => {
 
   return (
     <AppShell>
-      <div className="flex items-center justify-between mb-4">
-        <div>
+      <div className="flex items-center justify-between mb-4 gap-2">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold">I miei programmi</h1>
           <p className="text-sm text-muted-foreground">{programs.length} totali · {programs.filter(p => p.active).length} attivi</p>
         </div>
-        <Button asChild>
-          <Link to="/programmi/nuovo"><Plus className="size-4" /> Nuovo</Link>
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={programs.length === 0}
+            onClick={async () => {
+              try { await exportProgramsToXlsx(programs); toast.success("Excel esportato"); }
+              catch { toast.error("Errore esportazione"); }
+            }}
+          >
+            <FileSpreadsheet className="size-4" /> Esporta
+          </Button>
+          <Button asChild>
+            <Link to="/programmi/nuovo"><Plus className="size-4" /> Nuovo</Link>
+          </Button>
+        </div>
       </div>
+
+      <ConflictBanner conflicts={findConflicts(programs)} />
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
