@@ -48,6 +48,7 @@ const Dashboard = () => {
 
   const today = jsDayToAppDay(new Date().getDay());
   const todayLabel = DAYS.find(d => d.id === today)?.full ?? "";
+  const conflicts = useMemo(() => findConflicts(programs), [programs]);
   const currentWeekLetter = getCurrentWeekLetter(now);
   const activePrograms = programs.filter(p => p.active);
 
