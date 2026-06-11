@@ -208,6 +208,8 @@ const Dashboard = () => {
         </div>
       </section>
 
+      <ConflictBanner conflicts={conflicts} />
+
       {/* Live: in esecuzione */}
       {currentRun && (
         <section className="mb-5">
