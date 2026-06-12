@@ -9,11 +9,32 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets } from "lucide-react";
+import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, CloudFog, CloudDrizzle, Wind, MapPin } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, getProgramTotalMinutes } from "@/lib/irrigation";
 import { findConflicts } from "@/lib/conflicts";
 import { ConflictBanner } from "@/components/ConflictBanner";
 import { cn } from "@/lib/utils";
+
+interface Weather {
+  temp: number;
+  code: number;
+  humidity: number;
+  wind: number;
+}
+
+const weatherInfo = (code: number): { label: string; Icon: typeof Sun } => {
+  if (code === 0) return { label: "Sereno", Icon: Sun };
+  if (code <= 2) return { label: "Poco nuvoloso", Icon: Cloud };
+  if (code === 3) return { label: "Nuvoloso", Icon: Cloud };
+  if (code <= 48) return { label: "Nebbia", Icon: CloudFog };
+  if (code <= 57) return { label: "Pioviggine", Icon: CloudDrizzle };
+  if (code <= 67) return { label: "Pioggia", Icon: CloudRain };
+  if (code <= 77) return { label: "Neve", Icon: CloudSnow };
+  if (code <= 82) return { label: "Rovesci", Icon: CloudRain };
+  if (code <= 86) return { label: "Neve", Icon: CloudSnow };
+  if (code <= 99) return { label: "Temporale", Icon: CloudLightning };
+  return { label: "—", Icon: Cloud };
+};
 
 interface Slot {
   time: string;
