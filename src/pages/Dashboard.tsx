@@ -9,11 +9,32 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets } from "lucide-react";
+import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, CloudFog, CloudDrizzle, Wind, MapPin } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, getProgramTotalMinutes } from "@/lib/irrigation";
 import { findConflicts } from "@/lib/conflicts";
 import { ConflictBanner } from "@/components/ConflictBanner";
 import { cn } from "@/lib/utils";
+
+interface Weather {
+  temp: number;
+  code: number;
+  humidity: number;
+  wind: number;
+}
+
+const weatherInfo = (code: number): { label: string; Icon: typeof Sun } => {
+  if (code === 0) return { label: "Sereno", Icon: Sun };
+  if (code <= 2) return { label: "Poco nuvoloso", Icon: Cloud };
+  if (code === 3) return { label: "Nuvoloso", Icon: Cloud };
+  if (code <= 48) return { label: "Nebbia", Icon: CloudFog };
+  if (code <= 57) return { label: "Pioviggine", Icon: CloudDrizzle };
+  if (code <= 67) return { label: "Pioggia", Icon: CloudRain };
+  if (code <= 77) return { label: "Neve", Icon: CloudSnow };
+  if (code <= 82) return { label: "Rovesci", Icon: CloudRain };
+  if (code <= 86) return { label: "Neve", Icon: CloudSnow };
+  if (code <= 99) return { label: "Temporale", Icon: CloudLightning };
+  return { label: "—", Icon: Cloud };
+};
 
 interface Slot {
   time: string;
@@ -29,6 +50,27 @@ const Dashboard = () => {
   const [filterTime, setFilterTime] = useState<string>("all");
   const [filterSector, setFilterSector] = useState<string>("all");
   const [filterProgram, setFilterProgram] = useState<string>("all");
+  const [weather, setWeather] = useState<Weather | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.1167&longitude=16.4833&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&timezone=Europe%2FRome");
+        const j = await r.json();
+        if (cancelled || !j?.current) return;
+        setWeather({
+          temp: Math.round(j.current.temperature_2m),
+          code: j.current.weather_code,
+          humidity: Math.round(j.current.relative_humidity_2m),
+          wind: Math.round(j.current.wind_speed_10m),
+        });
+      } catch {}
+    };
+    load();
+    const id = setInterval(load, 10 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -176,13 +218,16 @@ const Dashboard = () => {
 
   return (
     <AppShell>
-      {/* Hero: data + ora + benvenuto + settimana */}
+      {/* Hero: data + ora + meteo + settimana + prossima irrigazione */}
       <section className="mb-5">
-        <div className="rounded-2xl gradient-fresh p-5 sm:p-7 text-primary-foreground shadow-elevated relative overflow-hidden">
-          <div className="absolute -right-10 -top-10 size-44 rounded-full bg-white/10 blur-2xl" />
+        <div className="rounded-3xl gradient-fresh p-5 sm:p-6 text-primary-foreground shadow-elevated relative overflow-hidden">
+          <div className="absolute -right-16 -top-16 size-56 rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute -left-12 -bottom-12 size-48 rounded-full bg-white/5 blur-3xl" />
+
+          {/* Top: data + ora */}
           <div className="relative flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-widest opacity-80 font-semibold">{todayLabel}</p>
+              <p className="text-[11px] uppercase tracking-widest opacity-80 font-bold">{todayLabel}</p>
               <p className="text-sm opacity-90 mt-0.5 capitalize">{dateLabel}</p>
               <h1 className="text-xl sm:text-2xl font-bold leading-tight mt-2">{greeting} 🌱</h1>
             </div>
@@ -191,18 +236,69 @@ const Dashboard = () => {
               <p className="text-[10px] uppercase tracking-widest opacity-80 mt-1">Ora attuale</p>
             </div>
           </div>
-          <div className="relative mt-4 pt-4 border-t border-white/20 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="size-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-                <Droplets className="size-5" />
+
+          {/* Meteo Ruvo di Puglia */}
+          <div className="relative mt-4 pt-4 border-t border-white/20">
+            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-2">
+              <MapPin className="size-3" /> Ruvo di Puglia · Meteo ora
+            </div>
+            {weather ? (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+                    {(() => { const { Icon } = weatherInfo(weather.code); return <Icon className="size-8" />; })()}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-3xl font-extrabold leading-none tabular-nums">{weather.temp}°<span className="text-base opacity-80">C</span></div>
+                    <p className="text-sm font-semibold opacity-95 mt-1 truncate">{weatherInfo(weather.code).label}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
+                    <Droplets className="size-3" /> {weather.humidity}%
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
+                    <Wind className="size-3" /> {weather.wind} km/h
+                  </span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Settimana in corso</p>
-                <p className="text-lg font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
+            ) : (
+              <div className="h-14 rounded-2xl bg-white/10 animate-pulse" />
+            )}
+          </div>
+
+          {/* Settimana + Prossima irrigazione */}
+          <div className="relative mt-4 pt-4 border-t border-white/20 grid grid-cols-2 gap-3">
+            {/* Settimana */}
+            <div className="rounded-2xl bg-white/10 p-3">
+              <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold mb-1.5">Settimana</p>
+              <div className="flex items-center gap-2">
+                <div className="size-9 rounded-lg bg-white/25 flex items-center justify-center text-lg font-extrabold shrink-0">
+                  {currentWeekLetter === "A" ? "C" : "A"}
+                </div>
+                <p className="text-base font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
               </div>
             </div>
-            <div className="size-11 rounded-xl bg-white/20 flex items-center justify-center text-2xl font-extrabold shrink-0">
-              {currentWeekLetter === "A" ? "C" : "A"}
+
+            {/* Prossima irrigazione */}
+            <div className="rounded-2xl bg-white/10 p-3">
+              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-1.5">
+                <Timer className="size-3" /> Prossima
+              </div>
+              {nextSlot && nextSlotDate ? (
+                <>
+                  <div className="text-base font-extrabold leading-tight tabular-nums">
+                    {cdDays > 0 && <span>{cdDays}g </span>}
+                    {pad(cdH)}:{pad(cdM)}:<span className="opacity-80">{pad(cdS)}</span>
+                  </div>
+                  <p className="text-[11px] font-semibold opacity-90 truncate mt-0.5">
+                    {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
+                  </p>
+                  <p className="text-[11px] opacity-80 truncate">{nextSlot.program.name}</p>
+                </>
+              ) : (
+                <p className="text-sm font-semibold opacity-90">Nessuna in programma</p>
+              )}
             </div>
           </div>
         </div>
@@ -267,59 +363,6 @@ const Dashboard = () => {
               <div className="h-2 rounded-full bg-secondary overflow-hidden">
                 <div className="h-full bg-primary transition-all duration-1000"
                   style={{ width: `${Math.min(100, (currentRun.elapsedSeconds / currentRun.totalSeconds) * 100)}%` }} />
-              </div>
-            </div>
-          </Card>
-        </section>
-      )}
-
-
-      {/* Prossima irrigazione - countdown moderno */}
-      {nextSlot && nextSlotDate && (
-        <section className="mb-5">
-          <Card className="p-5 border-0 shadow-elevated bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground relative overflow-hidden">
-            <div className="absolute -right-16 -bottom-16 size-56 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute -left-10 -top-10 size-32 rounded-full bg-white/5 blur-2xl" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2 font-extrabold text-xs uppercase tracking-widest opacity-90">
-                  <Timer className="size-4" /> Prossima irrigazione
-                </div>
-                <span className="text-xs font-semibold tabular-nums opacity-90">{nextSlot.dayLabel} · {formatTime(nextSlot.time)}</span>
-              </div>
-              <div className="font-bold text-lg truncate mb-4 opacity-95">{nextSlot.program.name}</div>
-              <div className="flex items-end justify-center gap-2 sm:gap-3 tabular-nums font-mono">
-                {cdDays > 0 && (
-                  <>
-                    <div className="flex flex-col items-center">
-                      <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                        <span className="text-4xl sm:text-5xl font-extrabold leading-none">{cdDays}</span>
-                      </div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">giorni</span>
-                    </div>
-                    <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
-                  </>
-                )}
-                <div className="flex flex-col items-center">
-                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                    <span className="text-4xl sm:text-5xl font-extrabold leading-none">{pad(cdH)}</span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">ore</span>
-                </div>
-                <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
-                <div className="flex flex-col items-center">
-                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                    <span className="text-4xl sm:text-5xl font-extrabold leading-none">{pad(cdM)}</span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">min</span>
-                </div>
-                <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
-                <div className="flex flex-col items-center">
-                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                    <span className="text-4xl sm:text-5xl font-extrabold leading-none tabular-nums">{pad(cdS)}</span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">sec</span>
-                </div>
               </div>
             </div>
           </Card>
