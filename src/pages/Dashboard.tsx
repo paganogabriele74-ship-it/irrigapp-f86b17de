@@ -50,6 +50,27 @@ const Dashboard = () => {
   const [filterTime, setFilterTime] = useState<string>("all");
   const [filterSector, setFilterSector] = useState<string>("all");
   const [filterProgram, setFilterProgram] = useState<string>("all");
+  const [weather, setWeather] = useState<Weather | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.1167&longitude=16.4833&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&timezone=Europe%2FRome");
+        const j = await r.json();
+        if (cancelled || !j?.current) return;
+        setWeather({
+          temp: Math.round(j.current.temperature_2m),
+          code: j.current.weather_code,
+          humidity: Math.round(j.current.relative_humidity_2m),
+          wind: Math.round(j.current.wind_speed_10m),
+        });
+      } catch {}
+    };
+    load();
+    const id = setInterval(load, 10 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
 
   useEffect(() => {
     (async () => {
