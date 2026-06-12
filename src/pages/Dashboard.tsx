@@ -218,13 +218,16 @@ const Dashboard = () => {
 
   return (
     <AppShell>
-      {/* Hero: data + ora + benvenuto + settimana */}
+      {/* Hero: data + ora + meteo + settimana + prossima irrigazione */}
       <section className="mb-5">
-        <div className="rounded-2xl gradient-fresh p-5 sm:p-7 text-primary-foreground shadow-elevated relative overflow-hidden">
-          <div className="absolute -right-10 -top-10 size-44 rounded-full bg-white/10 blur-2xl" />
+        <div className="rounded-3xl gradient-fresh p-5 sm:p-6 text-primary-foreground shadow-elevated relative overflow-hidden">
+          <div className="absolute -right-16 -top-16 size-56 rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute -left-12 -bottom-12 size-48 rounded-full bg-white/5 blur-3xl" />
+
+          {/* Top: data + ora */}
           <div className="relative flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-widest opacity-80 font-semibold">{todayLabel}</p>
+              <p className="text-[11px] uppercase tracking-widest opacity-80 font-bold">{todayLabel}</p>
               <p className="text-sm opacity-90 mt-0.5 capitalize">{dateLabel}</p>
               <h1 className="text-xl sm:text-2xl font-bold leading-tight mt-2">{greeting} 🌱</h1>
             </div>
@@ -233,18 +236,69 @@ const Dashboard = () => {
               <p className="text-[10px] uppercase tracking-widest opacity-80 mt-1">Ora attuale</p>
             </div>
           </div>
-          <div className="relative mt-4 pt-4 border-t border-white/20 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="size-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-                <Droplets className="size-5" />
+
+          {/* Meteo Ruvo di Puglia */}
+          <div className="relative mt-4 pt-4 border-t border-white/20">
+            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-2">
+              <MapPin className="size-3" /> Ruvo di Puglia · Meteo ora
+            </div>
+            {weather ? (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+                    {(() => { const { Icon } = weatherInfo(weather.code); return <Icon className="size-8" />; })()}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-3xl font-extrabold leading-none tabular-nums">{weather.temp}°<span className="text-base opacity-80">C</span></div>
+                    <p className="text-sm font-semibold opacity-95 mt-1 truncate">{weatherInfo(weather.code).label}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
+                    <Droplets className="size-3" /> {weather.humidity}%
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
+                    <Wind className="size-3" /> {weather.wind} km/h
+                  </span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Settimana in corso</p>
-                <p className="text-lg font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
+            ) : (
+              <div className="h-14 rounded-2xl bg-white/10 animate-pulse" />
+            )}
+          </div>
+
+          {/* Settimana + Prossima irrigazione */}
+          <div className="relative mt-4 pt-4 border-t border-white/20 grid grid-cols-2 gap-3">
+            {/* Settimana */}
+            <div className="rounded-2xl bg-white/10 p-3">
+              <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold mb-1.5">Settimana</p>
+              <div className="flex items-center gap-2">
+                <div className="size-9 rounded-lg bg-white/25 flex items-center justify-center text-lg font-extrabold shrink-0">
+                  {currentWeekLetter === "A" ? "C" : "A"}
+                </div>
+                <p className="text-base font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
               </div>
             </div>
-            <div className="size-11 rounded-xl bg-white/20 flex items-center justify-center text-2xl font-extrabold shrink-0">
-              {currentWeekLetter === "A" ? "C" : "A"}
+
+            {/* Prossima irrigazione */}
+            <div className="rounded-2xl bg-white/10 p-3">
+              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-1.5">
+                <Timer className="size-3" /> Prossima
+              </div>
+              {nextSlot && nextSlotDate ? (
+                <>
+                  <div className="text-base font-extrabold leading-tight tabular-nums">
+                    {cdDays > 0 && <span>{cdDays}g </span>}
+                    {pad(cdH)}:{pad(cdM)}:<span className="opacity-80">{pad(cdS)}</span>
+                  </div>
+                  <p className="text-[11px] font-semibold opacity-90 truncate mt-0.5">
+                    {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
+                  </p>
+                  <p className="text-[11px] opacity-80 truncate">{nextSlot.program.name}</p>
+                </>
+              ) : (
+                <p className="text-sm font-semibold opacity-90">Nessuna in programma</p>
+              )}
             </div>
           </div>
         </div>
