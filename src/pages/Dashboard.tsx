@@ -369,59 +369,6 @@ const Dashboard = () => {
         </section>
       )}
 
-
-      {/* Prossima irrigazione - countdown moderno */}
-      {nextSlot && nextSlotDate && (
-        <section className="mb-5">
-          <Card className="p-5 border-0 shadow-elevated bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground relative overflow-hidden">
-            <div className="absolute -right-16 -bottom-16 size-56 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute -left-10 -top-10 size-32 rounded-full bg-white/5 blur-2xl" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2 font-extrabold text-xs uppercase tracking-widest opacity-90">
-                  <Timer className="size-4" /> Prossima irrigazione
-                </div>
-                <span className="text-xs font-semibold tabular-nums opacity-90">{nextSlot.dayLabel} · {formatTime(nextSlot.time)}</span>
-              </div>
-              <div className="font-bold text-lg truncate mb-4 opacity-95">{nextSlot.program.name}</div>
-              <div className="flex items-end justify-center gap-2 sm:gap-3 tabular-nums font-mono">
-                {cdDays > 0 && (
-                  <>
-                    <div className="flex flex-col items-center">
-                      <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                        <span className="text-4xl sm:text-5xl font-extrabold leading-none">{cdDays}</span>
-                      </div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">giorni</span>
-                    </div>
-                    <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
-                  </>
-                )}
-                <div className="flex flex-col items-center">
-                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                    <span className="text-4xl sm:text-5xl font-extrabold leading-none">{pad(cdH)}</span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">ore</span>
-                </div>
-                <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
-                <div className="flex flex-col items-center">
-                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                    <span className="text-4xl sm:text-5xl font-extrabold leading-none">{pad(cdM)}</span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">min</span>
-                </div>
-                <span className="text-4xl sm:text-5xl font-extrabold opacity-40 pb-7">:</span>
-                <div className="flex flex-col items-center">
-                  <div className="rounded-2xl bg-white/15 backdrop-blur px-3 py-3 min-w-[64px] sm:min-w-[80px] text-center shadow-inner">
-                    <span className="text-4xl sm:text-5xl font-extrabold leading-none tabular-nums">{pad(cdS)}</span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-80">sec</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </section>
-      )}
-
       {/* Programma di oggi */}
       <section>
         <div className="flex items-center justify-between mb-3 gap-2">
