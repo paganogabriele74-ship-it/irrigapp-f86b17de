@@ -7,7 +7,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const ConflictBanner = ({ conflicts }: { conflicts: Conflict[] }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   if (conflicts.length === 0) return null;
   return (
     <Card className="mb-5 border-destructive/40 bg-destructive/5">
