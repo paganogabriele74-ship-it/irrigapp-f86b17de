@@ -267,39 +267,64 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Settimana + Prossima irrigazione */}
-          <div className="relative mt-4 pt-4 border-t border-white/20 grid grid-cols-2 gap-3">
-            {/* Settimana */}
-            <div className="rounded-2xl bg-white/10 p-3">
-              <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold mb-1.5">Settimana</p>
-              <div className="flex items-center gap-2">
-                <div className="size-9 rounded-lg bg-white/25 flex items-center justify-center text-lg font-extrabold shrink-0">
-                  {currentWeekLetter === "A" ? "C" : "A"}
-                </div>
-                <p className="text-base font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
+          {/* Allerta vento */}
+          {weather && weather.wind >= 20 && (
+            <div className="relative mt-4 rounded-2xl bg-amber-500/25 border border-amber-200/50 p-3 flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-amber-400/40 flex items-center justify-center shrink-0">
+                <Wind className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-extrabold leading-tight uppercase tracking-wide">
+                  {weather.wind >= 40 ? "Vento forte" : "Allerta vento"}
+                </p>
+                <p className="text-[11px] opacity-95 mt-0.5">
+                  {weather.wind} km/h · valuta di posticipare l'irrigazione
+                </p>
               </div>
             </div>
+          )}
 
-            {/* Prossima irrigazione */}
-            <div className="rounded-2xl bg-white/10 p-3">
-              <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-1.5">
-                <Timer className="size-3" /> Prossima
+          {/* Settimana */}
+          <div className="relative mt-4 pt-4 border-t border-white/20 flex items-center justify-between gap-3">
+            <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">Settimana in corso</p>
+            <div className="flex items-center gap-2">
+              <div className="size-8 rounded-lg bg-white/25 flex items-center justify-center text-base font-extrabold shrink-0">
+                {currentWeekLetter === "A" ? "C" : "A"}
               </div>
-              {nextSlot && nextSlotDate ? (
-                <>
-                  <div className="text-base font-extrabold leading-tight tabular-nums">
-                    {cdDays > 0 && <span>{cdDays}g </span>}
-                    {pad(cdH)}:{pad(cdM)}:<span className="opacity-80">{pad(cdS)}</span>
-                  </div>
-                  <p className="text-[11px] font-semibold opacity-90 truncate mt-0.5">
+              <p className="text-sm font-extrabold leading-tight uppercase">{currentWeekLetter === "A" ? "Concime" : "Acido"}</p>
+            </div>
+          </div>
+
+          {/* Prossima irrigazione — grande */}
+          <div className="relative mt-3 rounded-2xl bg-white/15 p-4 sm:p-5">
+            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-2">
+              <Timer className="size-3.5" /> Prossima irrigazione
+            </div>
+            {nextSlot && nextSlotDate ? (
+              <>
+                <div className="grid grid-cols-4 gap-2 mb-3">
+                  {[
+                    { v: cdDays, l: "giorni" },
+                    { v: cdH, l: "ore" },
+                    { v: cdM, l: "min" },
+                    { v: cdS, l: "sec" },
+                  ].map((x, i) => (
+                    <div key={i} className="rounded-xl bg-white/15 py-2 text-center">
+                      <div className="text-2xl sm:text-3xl font-extrabold tabular-nums leading-none">{pad(x.v)}</div>
+                      <div className="text-[9px] uppercase tracking-widest opacity-80 mt-1 font-bold">{x.l}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-extrabold truncate">{nextSlot.program.name}</p>
+                  <p className="text-sm font-bold opacity-95 shrink-0 tabular-nums">
                     {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
                   </p>
-                  <p className="text-[11px] opacity-80 truncate">{nextSlot.program.name}</p>
-                </>
-              ) : (
-                <p className="text-sm font-semibold opacity-90">Nessuna in programma</p>
-              )}
-            </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-base font-semibold opacity-90">Nessuna irrigazione in programma</p>
+            )}
           </div>
         </div>
       </section>
