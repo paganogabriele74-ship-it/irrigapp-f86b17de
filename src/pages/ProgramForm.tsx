@@ -123,6 +123,17 @@ const ProgramForm = () => {
       setLoading(false);
     })();
   }, [id, isEdit, navigate]);
+  const [others, setOthers] = useState<OtherProgram[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("programs")
+        .select("id,name,dosage,duration_minutes,days_of_week,sectors,week_pattern,sector_mode,program_times(start_time)")
+        .order("name");
+      const list = ((data ?? []) as any[]).filter(p => !isEdit || p.id !== id) as OtherProgram[];
+      setOthers(list);
+    })();
+  }, [id, isEdit]);
 
   const toggle = <T,>(arr: T[], v: T) =>
     arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
