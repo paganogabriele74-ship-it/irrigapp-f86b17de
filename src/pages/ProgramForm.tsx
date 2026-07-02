@@ -379,7 +379,15 @@ const ProgramForm = () => {
           </div>
 
           <div>
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Settori:</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori:</div>
+              <CopyFrom
+                programs={others}
+                label="modalità"
+                onPick={(p) => setSectorMode(p.sector_mode)}
+                describe={(p) => p.sector_mode === "sequential" ? "Uno alla volta" : "Tutti insieme"}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-1.5">
               <button type="button" onClick={() => setSectorMode("parallel")} className={cn("py-2.5", pill(sectorMode === "parallel"))}>Tutti insieme</button>
               <button type="button" onClick={() => setSectorMode("sequential")} className={cn("py-2.5", pill(sectorMode === "sequential"))}>Uno alla volta</button>
