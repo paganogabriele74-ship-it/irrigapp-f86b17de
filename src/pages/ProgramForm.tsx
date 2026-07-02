@@ -439,11 +439,22 @@ const ProgramForm = () => {
 
         {/* Times - compact chip rows */}
         <Card className="p-4 space-y-2">
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-1 gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Orari</div>
-            <Button type="button" size="sm" variant="ghost" onClick={addTime} className="h-7 px-2 text-primary">
-              <Plus className="size-3.5" /> Aggiungi
-            </Button>
+            <div className="flex items-center gap-2">
+              <CopyFrom
+                programs={others}
+                label="orari"
+                onPick={(p) => {
+                  const t = (p.program_times ?? []).map(x => x.start_time.slice(0,5)).sort();
+                  setTimes(t.length > 0 ? t : ["08:00"]);
+                }}
+                describe={(p) => (p.program_times ?? []).map(x => x.start_time.slice(0,5)).sort().join(", ") || "nessun orario"}
+              />
+              <Button type="button" size="sm" variant="ghost" onClick={addTime} className="h-7 px-2 text-primary">
+                <Plus className="size-3.5" /> Aggiungi
+              </Button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             {times.map((t, i) => (
