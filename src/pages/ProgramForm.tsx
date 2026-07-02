@@ -311,7 +311,15 @@ const ProgramForm = () => {
         {/* Dosage as colored pills + duration stepper */}
         <Card className="p-4 space-y-4">
           <div>
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Dosaggio</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Dosaggio</div>
+              <CopyFrom
+                programs={others}
+                label="dosaggio"
+                onPick={(p) => setDosage(p.dosage)}
+                describe={(p) => DOSAGE_LABELS[p.dosage]}
+              />
+            </div>
             <div className="grid grid-cols-3 gap-1.5">
               {(Object.keys(DOSAGE_LABELS) as DosageType[]).map(d => {
                 const sel = dosage === d;
