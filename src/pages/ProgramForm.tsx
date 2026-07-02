@@ -8,10 +8,66 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { SignedImage } from "@/components/SignedImage";
-import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock, Minus } from "lucide-react";
-import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, WeekPattern } from "@/lib/irrigation";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock, Minus, Copy } from "lucide-react";
+import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+type OtherProgram = {
+  id: string;
+  name: string;
+  dosage: DosageType;
+  duration_minutes: number;
+  days_of_week: number[];
+  sectors: number[];
+  week_pattern: WeekPattern;
+  sector_mode: SectorMode;
+  program_times: { start_time: string }[];
+};
+
+const CopyFrom = ({
+  programs,
+  label,
+  onPick,
+  describe,
+}: {
+  programs: OtherProgram[];
+  label: string;
+  onPick: (p: OtherProgram) => void;
+  describe: (p: OtherProgram) => string;
+}) => {
+  const [open, setOpen] = useState(false);
+  if (programs.length === 0) return null;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+        >
+          <Copy className="size-3" /> Copia da…
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-64 p-1 max-h-72 overflow-y-auto">
+        <div className="px-2 py-1.5 text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+          Copia {label} da
+        </div>
+        {programs.map(p => (
+          <button
+            key={p.id}
+            type="button"
+            onClick={() => { onPick(p); setOpen(false); toast.success(`${label} copiato da "${p.name}"`); }}
+            className="w-full text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
+          >
+            <div className="text-sm font-semibold truncate">{p.name}</div>
+            <div className="text-[11px] text-muted-foreground truncate">{describe(p)}</div>
+          </button>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 const schema = z.object({
   name: z.string().trim().min(1, "Inserisci un nome").max(60, "Massimo 60 caratteri"),
@@ -67,6 +123,17 @@ const ProgramForm = () => {
       setLoading(false);
     })();
   }, [id, isEdit, navigate]);
+  const [others, setOthers] = useState<OtherProgram[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("programs")
+        .select("id,name,dosage,duration_minutes,days_of_week,sectors,week_pattern,sector_mode,program_times(start_time)")
+        .order("name");
+      const list = ((data ?? []) as any[]).filter(p => !isEdit || p.id !== id) as OtherProgram[];
+      setOthers(list);
+    })();
+  }, [id, isEdit]);
 
   const toggle = <T,>(arr: T[], v: T) =>
     arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
@@ -244,7 +311,15 @@ const ProgramForm = () => {
         {/* Dosage as colored pills + duration stepper */}
         <Card className="p-4 space-y-4">
           <div>
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Dosaggio</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Dosaggio</div>
+              <CopyFrom
+                programs={others}
+                label="dosaggio"
+                onPick={(p) => setDosage(p.dosage)}
+                describe={(p) => DOSAGE_LABELS[p.dosage]}
+              />
+            </div>
             <div className="grid grid-cols-3 gap-1.5">
               {(Object.keys(DOSAGE_LABELS) as DosageType[]).map(d => {
                 const sel = dosage === d;
@@ -263,9 +338,17 @@ const ProgramForm = () => {
           </div>
 
           <div>
-            <div className="flex items-baseline justify-between mb-2">
+            <div className="flex items-baseline justify-between mb-2 gap-2">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Durata per settore</span>
-              <span className="text-xs text-muted-foreground tabular-nums">Tot: {totalMinutes} min</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground tabular-nums">Tot: {totalMinutes} min</span>
+                <CopyFrom
+                  programs={others}
+                  label="durata"
+                  onPick={(p) => setDuration(p.duration_minutes)}
+                  describe={(p) => `${p.duration_minutes} min`}
+                />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button type="button" variant="outline" size="icon" onClick={() => setDuration(d => Math.max(1, d - 1))}>
@@ -296,7 +379,15 @@ const ProgramForm = () => {
           </div>
 
           <div>
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Settori:</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori:</div>
+              <CopyFrom
+                programs={others}
+                label="modalità"
+                onPick={(p) => setSectorMode(p.sector_mode)}
+                describe={(p) => p.sector_mode === "sequential" ? "Uno alla volta" : "Tutti insieme"}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-1.5">
               <button type="button" onClick={() => setSectorMode("parallel")} className={cn("py-2.5", pill(sectorMode === "parallel"))}>Tutti insieme</button>
               <button type="button" onClick={() => setSectorMode("sequential")} className={cn("py-2.5", pill(sectorMode === "sequential"))}>Uno alla volta</button>
@@ -306,12 +397,18 @@ const ProgramForm = () => {
 
         {/* Days + week pattern combined */}
         <Card className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Giorni</div>
-            <div className="flex gap-1 text-[11px]">
+            <div className="flex gap-1 text-[11px] items-center">
               <button type="button" onClick={() => setDays([1,2,3,4,5,6,7])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">Tutti</button>
               <button type="button" onClick={() => setDays([1,2,3,4,5])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">L-V</button>
               <button type="button" onClick={() => setDays([])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">—</button>
+              <CopyFrom
+                programs={others}
+                label="giorni e settimana"
+                onPick={(p) => { setDays(p.days_of_week); setWeekPattern(p.week_pattern); }}
+                describe={(p) => `${[...p.days_of_week].sort().map(d => DAYS.find(x => x.id === d)?.short).join(", ") || "—"} · ${WEEK_PATTERN_LABELS[p.week_pattern]}`}
+              />
             </div>
           </div>
           <div className="grid grid-cols-7 gap-1">
@@ -342,11 +439,22 @@ const ProgramForm = () => {
 
         {/* Times - compact chip rows */}
         <Card className="p-4 space-y-2">
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-1 gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Orari</div>
-            <Button type="button" size="sm" variant="ghost" onClick={addTime} className="h-7 px-2 text-primary">
-              <Plus className="size-3.5" /> Aggiungi
-            </Button>
+            <div className="flex items-center gap-2">
+              <CopyFrom
+                programs={others}
+                label="orari"
+                onPick={(p) => {
+                  const t = (p.program_times ?? []).map(x => x.start_time.slice(0,5)).sort();
+                  setTimes(t.length > 0 ? t : ["08:00"]);
+                }}
+                describe={(p) => (p.program_times ?? []).map(x => x.start_time.slice(0,5)).sort().join(", ") || "nessun orario"}
+              />
+              <Button type="button" size="sm" variant="ghost" onClick={addTime} className="h-7 px-2 text-primary">
+                <Plus className="size-3.5" /> Aggiungi
+              </Button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             {times.map((t, i) => (
@@ -370,12 +478,18 @@ const ProgramForm = () => {
 
         {/* Sectors - compact grid */}
         <Card className="p-4 space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori</div>
-            <div className="flex gap-1 text-[11px]">
+            <div className="flex gap-1 text-[11px] items-center">
               <span className="text-xs text-muted-foreground mr-1 self-center">{sectors.length}/32</span>
               <button type="button" onClick={() => setSectors(SECTORS)} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">Tutti</button>
               <button type="button" onClick={() => setSectors([])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">—</button>
+              <CopyFrom
+                programs={others}
+                label="settori"
+                onPick={(p) => setSectors(p.sectors)}
+                describe={(p) => p.sectors.length === 0 ? "—" : `${p.sectors.length} settori`}
+              />
             </div>
           </div>
           <div className="grid grid-cols-8 gap-1">
