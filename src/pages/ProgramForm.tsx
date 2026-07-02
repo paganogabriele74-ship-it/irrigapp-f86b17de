@@ -338,9 +338,17 @@ const ProgramForm = () => {
           </div>
 
           <div>
-            <div className="flex items-baseline justify-between mb-2">
+            <div className="flex items-baseline justify-between mb-2 gap-2">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Durata per settore</span>
-              <span className="text-xs text-muted-foreground tabular-nums">Tot: {totalMinutes} min</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground tabular-nums">Tot: {totalMinutes} min</span>
+                <CopyFrom
+                  programs={others}
+                  label="durata"
+                  onPick={(p) => setDuration(p.duration_minutes)}
+                  describe={(p) => `${p.duration_minutes} min`}
+                />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button type="button" variant="outline" size="icon" onClick={() => setDuration(d => Math.max(1, d - 1))}>
