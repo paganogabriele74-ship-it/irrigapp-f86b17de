@@ -8,10 +8,66 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { SignedImage } from "@/components/SignedImage";
-import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock, Minus } from "lucide-react";
-import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, WeekPattern } from "@/lib/irrigation";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, X, Image as ImageIcon, Trash2, ArrowLeft, Save, Clock, Minus, Copy } from "lucide-react";
+import { DAYS, DOSAGE_LABELS, DosageType, SECTORS, SectorMode, WeekPattern, WEEK_PATTERN_LABELS } from "@/lib/irrigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+type OtherProgram = {
+  id: string;
+  name: string;
+  dosage: DosageType;
+  duration_minutes: number;
+  days_of_week: number[];
+  sectors: number[];
+  week_pattern: WeekPattern;
+  sector_mode: SectorMode;
+  program_times: { start_time: string }[];
+};
+
+const CopyFrom = ({
+  programs,
+  label,
+  onPick,
+  describe,
+}: {
+  programs: OtherProgram[];
+  label: string;
+  onPick: (p: OtherProgram) => void;
+  describe: (p: OtherProgram) => string;
+}) => {
+  const [open, setOpen] = useState(false);
+  if (programs.length === 0) return null;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+        >
+          <Copy className="size-3" /> Copia da…
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-64 p-1 max-h-72 overflow-y-auto">
+        <div className="px-2 py-1.5 text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+          Copia {label} da
+        </div>
+        {programs.map(p => (
+          <button
+            key={p.id}
+            type="button"
+            onClick={() => { onPick(p); setOpen(false); toast.success(`${label} copiato da "${p.name}"`); }}
+            className="w-full text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
+          >
+            <div className="text-sm font-semibold truncate">{p.name}</div>
+            <div className="text-[11px] text-muted-foreground truncate">{describe(p)}</div>
+          </button>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 const schema = z.object({
   name: z.string().trim().min(1, "Inserisci un nome").max(60, "Massimo 60 caratteri"),
