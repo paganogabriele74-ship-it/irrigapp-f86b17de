@@ -397,12 +397,18 @@ const ProgramForm = () => {
 
         {/* Days + week pattern combined */}
         <Card className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Giorni</div>
-            <div className="flex gap-1 text-[11px]">
+            <div className="flex gap-1 text-[11px] items-center">
               <button type="button" onClick={() => setDays([1,2,3,4,5,6,7])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">Tutti</button>
               <button type="button" onClick={() => setDays([1,2,3,4,5])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">L-V</button>
               <button type="button" onClick={() => setDays([])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">—</button>
+              <CopyFrom
+                programs={others}
+                label="giorni e settimana"
+                onPick={(p) => { setDays(p.days_of_week); setWeekPattern(p.week_pattern); }}
+                describe={(p) => `${[...p.days_of_week].sort().map(d => DAYS.find(x => x.id === d)?.short).join(", ") || "—"} · ${WEEK_PATTERN_LABELS[p.week_pattern]}`}
+              />
             </div>
           </div>
           <div className="grid grid-cols-7 gap-1">
