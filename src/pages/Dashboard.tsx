@@ -218,6 +218,8 @@ const Dashboard = () => {
 
   return (
     <AppShell>
+      <ConflictBanner conflicts={conflicts} />
+
       {/* Hero: data + ora + meteo + settimana + prossima irrigazione */}
       <section className="mb-5">
         <div className="rounded-3xl gradient-fresh p-5 sm:p-6 text-primary-foreground shadow-elevated relative overflow-hidden">
@@ -328,8 +330,6 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
-
-      <ConflictBanner conflicts={conflicts} />
 
       {/* Live: in esecuzione */}
       {currentRun && (
