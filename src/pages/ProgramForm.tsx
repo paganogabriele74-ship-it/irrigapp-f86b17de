@@ -478,12 +478,18 @@ const ProgramForm = () => {
 
         {/* Sectors - compact grid */}
         <Card className="p-4 space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori</div>
-            <div className="flex gap-1 text-[11px]">
+            <div className="flex gap-1 text-[11px] items-center">
               <span className="text-xs text-muted-foreground mr-1 self-center">{sectors.length}/32</span>
               <button type="button" onClick={() => setSectors(SECTORS)} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">Tutti</button>
               <button type="button" onClick={() => setSectors([])} className="px-2 py-0.5 rounded bg-secondary/60 hover:bg-secondary">—</button>
+              <CopyFrom
+                programs={others}
+                label="settori"
+                onPick={(p) => setSectors(p.sectors)}
+                describe={(p) => p.sectors.length === 0 ? "—" : `${p.sectors.length} settori`}
+              />
             </div>
           </div>
           <div className="grid grid-cols-8 gap-1">
