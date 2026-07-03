@@ -9,17 +9,27 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, CloudFog, CloudDrizzle, Wind, MapPin } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
+import { Plus, Timer, Activity, SlidersHorizontal, X, Droplets, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, CloudFog, CloudDrizzle, Wind, MapPin, ChevronRight, AlertTriangle } from "lucide-react";
 import { DAYS, formatTime, jsDayToAppDay, Program, getCurrentWeekLetter, programRunsThisWeek, getProgramTotalMinutes } from "@/lib/irrigation";
 import { findConflicts } from "@/lib/conflicts";
 import { ConflictBanner } from "@/components/ConflictBanner";
 import { cn } from "@/lib/utils";
+
+interface HourlyPoint {
+  time: string; // ISO
+  temp: number;
+  code: number;
+  rain: number; // %
+  wind: number; // km/h
+}
 
 interface Weather {
   temp: number;
   code: number;
   humidity: number;
   wind: number;
+  hourly: HourlyPoint[];
 }
 
 const weatherInfo = (code: number): { label: string; Icon: typeof Sun } => {
