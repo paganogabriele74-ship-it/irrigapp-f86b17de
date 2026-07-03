@@ -1,52 +1,69 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Clock, CalendarDays, Layers } from "lucide-react";
 import { Conflict } from "@/lib/conflicts";
 import { Card } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WEEK_PATTERN_LABELS } from "@/lib/irrigation";
+
+const weekLabel = (week: Conflict["week"]) => {
+  if (week === "Entrambe") return "Entrambe le settimane";
+  return WEEK_PATTERN_LABELS[week] ?? `Settimana ${week}`;
+};
 
 export const ConflictBanner = ({ conflicts }: { conflicts: Conflict[] }) => {
   const [open, setOpen] = useState(true);
   if (conflicts.length === 0) return null;
   return (
-    <Card className="mb-5 overflow-hidden border-2 border-destructive bg-destructive text-destructive-foreground shadow-elevated md:bg-destructive/5 md:text-foreground">
+    <Card className="mb-4 overflow-hidden border-2 border-destructive bg-destructive text-destructive-foreground shadow-xl">
       <Collapsible open={open} onOpenChange={setOpen}>
-        <CollapsibleTrigger className="w-full p-3 sm:p-4 flex items-center gap-3 text-left">
-          <div className="size-11 rounded-xl bg-destructive-foreground/20 md:bg-destructive/15 flex items-center justify-center shrink-0">
-            <AlertTriangle className="size-6 text-destructive-foreground md:text-destructive" />
+        <CollapsibleTrigger className="w-full p-4 flex items-start gap-3 text-left">
+          <div className="mt-0.5 size-10 rounded-full bg-destructive-foreground/20 flex items-center justify-center shrink-0">
+            <AlertTriangle className="size-6 text-destructive-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-extrabold text-lg leading-tight text-destructive-foreground md:text-destructive">
-              ⚠️ {conflicts.length} {conflicts.length === 1 ? "sovrapposizione orari" : "sovrapposizioni orari"}
+            <p className="font-black text-lg leading-tight">
+              Attenzione: orari sovrapposti
             </p>
-            <p className="text-sm font-semibold opacity-95 mt-0.5 md:text-muted-foreground">
-              Stesso settore nello stesso momento: dettagli visibili sotto.
+            <p className="text-sm font-semibold opacity-95 mt-0.5">
+              {conflicts.length} {conflicts.length === 1 ? "programma occupa" : "programmi occupano"} lo stesso settore nello stesso orario.
             </p>
           </div>
-          <ChevronDown className={cn("size-6 opacity-90 transition-transform shrink-0", open && "rotate-180")} />
+          <ChevronDown className={cn("size-6 opacity-90 transition-transform shrink-0 mt-1", open && "rotate-180")} />
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-2">
+          <div className="px-4 pb-4 space-y-3">
             {conflicts.map((c, i) => (
-              <div key={i} className="rounded-lg bg-background text-foreground border border-destructive/30 p-3 text-sm shadow-soft">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                  <span className="text-base font-extrabold text-destructive">Settore {c.sector} · {c.dayLabel}</span>
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider px-2 py-1 rounded bg-destructive/15 text-destructive">
-                    Sett. {c.week}
+              <div key={i} className="rounded-xl bg-destructive-foreground/10 border border-destructive-foreground/20 p-3 text-sm">
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <span className="inline-flex items-center gap-1.5 font-extrabold">
+                    <Layers className="size-4" /> Settore {c.sector}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 font-bold opacity-90">
+                    <CalendarDays className="size-4" /> {c.dayLabel}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 font-bold opacity-90">
+                    <Clock className="size-4" /> {weekLabel(c.week)}
                   </span>
                 </div>
-                <div className="space-y-1 text-sm text-muted-foreground">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-bold text-foreground break-words">{c.programA.name}</span>
-                    <span className="font-mono text-base font-extrabold text-destructive">{c.rangeA}</span>
+
+                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 items-center text-sm">
+                  <span className="font-black text-destructive-foreground/80">A</span>
+                  <div className="min-w-0">
+                    <p className="font-bold truncate">{c.programA.name}</p>
+                    <p className="font-mono text-base font-black">{c.rangeA}</p>
                   </div>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-bold text-foreground break-words">{c.programB.name}</span>
-                    <span className="font-mono text-base font-extrabold text-destructive">{c.rangeB}</span>
+                  <span className="font-black text-destructive-foreground/80">B</span>
+                  <div className="min-w-0">
+                    <p className="font-bold truncate">{c.programB.name}</p>
+                    <p className="font-mono text-base font-black">{c.rangeB}</p>
                   </div>
-                  <div className="text-destructive font-extrabold mt-2">Sovrapposizione: {c.overlapMinutes} min</div>
                 </div>
+
+                <p className="mt-3 text-xs font-extrabold uppercase tracking-wide opacity-90">
+                  Sovrapposizione: {c.overlapMinutes} min
+                </p>
               </div>
             ))}
           </div>
@@ -55,3 +72,4 @@ export const ConflictBanner = ({ conflicts }: { conflicts: Conflict[] }) => {
     </Card>
   );
 };
+
