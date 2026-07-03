@@ -66,14 +66,30 @@ const Dashboard = () => {
     let cancelled = false;
     const load = async () => {
       try {
-        const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.1167&longitude=16.4833&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&timezone=Europe%2FRome");
+        const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.1167&longitude=16.4833&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m&forecast_hours=12&timezone=Europe%2FRome");
         const j = await r.json();
         if (cancelled || !j?.current) return;
+        const hourly: HourlyPoint[] = [];
+        if (j.hourly?.time) {
+          const nowIso = new Date();
+          for (let i = 0; i < j.hourly.time.length && hourly.length < 8; i++) {
+            const t = new Date(j.hourly.time[i]);
+            if (t.getTime() < nowIso.getTime() - 30 * 60 * 1000) continue;
+            hourly.push({
+              time: j.hourly.time[i],
+              temp: Math.round(j.hourly.temperature_2m[i]),
+              code: j.hourly.weather_code[i],
+              rain: Math.round(j.hourly.precipitation_probability?.[i] ?? 0),
+              wind: Math.round(j.hourly.wind_speed_10m[i]),
+            });
+          }
+        }
         setWeather({
           temp: Math.round(j.current.temperature_2m),
           code: j.current.weather_code,
           humidity: Math.round(j.current.relative_humidity_2m),
           wind: Math.round(j.current.wind_speed_10m),
+          hourly,
         });
       } catch {}
     };
