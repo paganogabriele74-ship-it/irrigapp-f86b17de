@@ -265,48 +265,103 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Meteo Ruvo di Puglia */}
-          <div className="relative mt-4 pt-4 border-t border-white/20">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-2">
-              <MapPin className="size-3" /> Ruvo di Puglia · Meteo ora
-            </div>
-            {weather ? (
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
-                    {(() => { const { Icon } = weatherInfo(weather.code); return <Icon className="size-8" />; })()}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-3xl font-extrabold leading-none tabular-nums">{weather.temp}°<span className="text-base opacity-80">C</span></div>
-                    <p className="text-sm font-semibold opacity-95 mt-1 truncate">{weatherInfo(weather.code).label}</p>
-                  </div>
+          {/* Meteo Ruvo di Puglia — tappabile per previsioni 8h */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className="relative mt-4 pt-4 border-t border-white/20 w-full text-left focus:outline-none active:opacity-80 transition"
+              >
+                <div className="flex items-center justify-between text-[10px] uppercase tracking-widest opacity-80 font-bold mb-2">
+                  <span className="flex items-center gap-1.5"><MapPin className="size-3" /> Ruvo di Puglia · Meteo ora</span>
+                  <span className="flex items-center gap-0.5 opacity-90 normal-case tracking-normal text-[10px] font-semibold">Previsioni 8h <ChevronRight className="size-3" /></span>
                 </div>
-                <div className="flex flex-col gap-1.5 shrink-0">
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
-                    <Droplets className="size-3" /> {weather.humidity}%
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
-                    <Wind className="size-3" /> {weather.wind} km/h
-                  </span>
-                </div>
+                {weather ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="size-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+                        {(() => { const { Icon } = weatherInfo(weather.code); return <Icon className="size-8" />; })()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-3xl font-extrabold leading-none tabular-nums">{weather.temp}°<span className="text-base opacity-80">C</span></div>
+                        <p className="text-sm font-semibold opacity-95 mt-1 truncate">{weatherInfo(weather.code).label}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1.5 shrink-0">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
+                        <Droplets className="size-3" /> {weather.humidity}%
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/15 text-[11px] font-bold">
+                        <Wind className="size-3" /> {weather.wind} km/h
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-14 rounded-2xl bg-white/10 animate-pulse" />
+                )}
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
+              <SheetHeader className="text-left">
+                <SheetTitle className="flex items-center gap-2"><MapPin className="size-4" /> Ruvo di Puglia · Prossime 8 ore</SheetTitle>
+                <SheetDescription>Temperatura, probabilità pioggia e vento. Se il vento supera 20 km/h chiudere gli sportelli.</SheetDescription>
+              </SheetHeader>
+              <div className="mt-4 divide-y divide-border rounded-2xl border bg-card">
+                {weather?.hourly?.length ? weather.hourly.map((h, i) => {
+                  const { Icon, label } = weatherInfo(h.code);
+                  const hour = new Date(h.time).getHours();
+                  const windAlert = h.wind >= 20;
+                  return (
+                    <div key={i} className="flex items-center gap-3 p-3">
+                      <div className="w-12 text-sm font-extrabold tabular-nums text-primary">{pad(hour)}:00</div>
+                      <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary">
+                        <Icon className="size-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold truncate">{label}</div>
+                        <div className="text-lg font-extrabold tabular-nums leading-tight">{h.temp}°C</div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-sky-700">
+                          <CloudRain className="size-3.5" /> {h.rain}%
+                        </span>
+                        <span className={cn(
+                          "inline-flex items-center gap-1 text-xs font-bold",
+                          windAlert ? "text-destructive" : "text-muted-foreground"
+                        )}>
+                          <Wind className="size-3.5" /> {h.wind} km/h
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }) : (
+                  <div className="p-6 text-center text-sm text-muted-foreground">Previsioni non disponibili</div>
+                )}
               </div>
-            ) : (
-              <div className="h-14 rounded-2xl bg-white/10 animate-pulse" />
-            )}
-          </div>
+              {weather?.hourly?.some(h => h.wind >= 20) && (
+                <div className="mt-4 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 flex items-start gap-2">
+                  <AlertTriangle className="size-5 text-destructive shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-extrabold text-destructive leading-tight">Vento forte previsto</p>
+                    <p className="text-xs text-destructive/90 mt-0.5">Chiudere gli sportelli nelle ore evidenziate.</p>
+                  </div>
+                </div>
+              )}
+            </SheetContent>
+          </Sheet>
 
-          {/* Allerta vento */}
+          {/* Allerta vento — sportelli */}
           {weather && weather.wind >= 20 && (
             <div className="relative mt-4 rounded-2xl bg-amber-500/25 border border-amber-200/50 p-3 flex items-center gap-3">
               <div className="size-10 rounded-xl bg-amber-400/40 flex items-center justify-center shrink-0">
-                <Wind className="size-5" />
+                <AlertTriangle className="size-5" />
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-extrabold leading-tight uppercase tracking-wide">
-                  {weather.wind >= 40 ? "Vento forte" : "Allerta vento"}
+                  Allerta vento · chiudere gli sportelli
                 </p>
                 <p className="text-[11px] opacity-95 mt-0.5">
-                  {weather.wind} km/h · valuta di posticipare l'irrigazione
+                  {weather.wind} km/h {weather.wind >= 40 ? "· vento forte" : ""}
                 </p>
               </div>
             </div>
@@ -323,9 +378,9 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Prossima irrigazione — grande */}
-          <div className="relative mt-3 rounded-2xl bg-white/15 p-4 sm:p-5">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest opacity-80 font-bold mb-2">
+          {/* Prossima irrigazione — bianco con testo azzurro */}
+          <div className="relative mt-3 rounded-2xl bg-white p-4 sm:p-5 shadow-md border border-white/40">
+            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-primary/70 font-bold mb-2">
               <Timer className="size-3.5" /> Prossima irrigazione
             </div>
             {nextSlot && nextSlotDate ? (
@@ -337,21 +392,21 @@ const Dashboard = () => {
                     { v: cdM, l: "min" },
                     { v: cdS, l: "sec" },
                   ].map((x, i) => (
-                    <div key={i} className="rounded-xl bg-white/15 py-2 text-center">
-                      <div className="text-2xl sm:text-3xl font-extrabold tabular-nums leading-none">{pad(x.v)}</div>
-                      <div className="text-[9px] uppercase tracking-widest opacity-80 mt-1 font-bold">{x.l}</div>
+                    <div key={i} className="rounded-xl bg-primary/5 border border-primary/15 py-2 text-center">
+                      <div className="text-2xl sm:text-3xl font-extrabold tabular-nums leading-none text-primary">{pad(x.v)}</div>
+                      <div className="text-[9px] uppercase tracking-widest text-primary/60 mt-1 font-bold">{x.l}</div>
                     </div>
                   ))}
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-extrabold truncate">{nextSlot.program.name}</p>
-                  <p className="text-sm font-bold opacity-95 shrink-0 tabular-nums">
+                  <p className="text-sm font-extrabold truncate text-primary">{nextSlot.program.name}</p>
+                  <p className="text-sm font-bold text-primary/80 shrink-0 tabular-nums">
                     {nextSlot.dayLabel} · {formatTime(nextSlot.time)}
                   </p>
                 </div>
               </>
             ) : (
-              <p className="text-base font-semibold opacity-90">Nessuna irrigazione in programma</p>
+              <p className="text-base font-semibold text-primary/70">Nessuna irrigazione in programma</p>
             )}
           </div>
         </div>
