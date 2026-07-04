@@ -185,9 +185,11 @@ const ProgramsList = () => {
         </div>
       ) : filtered.length === 0 ? (
         <Card className="p-10 text-center border-dashed">
-          <p className="text-muted-foreground mb-4">{programs.length === 0 ? "Nessun programma ancora." : "Nessun risultato."}</p>
-          {programs.length === 0 && (
+          <p className="text-muted-foreground mb-4">{programs.length === 0 ? "Nessun programma ancora." : "Nessun risultato per i filtri scelti."}</p>
+          {programs.length === 0 ? (
             <Button asChild><Link to="/programmi/nuovo"><Plus className="size-4" /> Crea il primo</Link></Button>
+          ) : activeFilterCount > 0 && (
+            <Button variant="outline" onClick={clearFilters}><X className="size-4" /> Cancella filtri</Button>
           )}
         </Card>
       ) : (
