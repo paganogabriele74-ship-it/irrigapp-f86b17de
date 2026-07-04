@@ -21,6 +21,10 @@ const ProgramsList = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [filterSector, setFilterSector] = useState<string>("all");
+  const [filterTime, setFilterTime] = useState<string>("all");
+  const [filterDosage, setFilterDosage] = useState<string>("all");
+  const [filterDuration, setFilterDuration] = useState<string>("all");
 
   const load = async () => {
     setLoading(true);
