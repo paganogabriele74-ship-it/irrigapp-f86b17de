@@ -16,6 +16,7 @@ import { ConflictBanner } from "@/components/ConflictBanner";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const ProgramsList = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
