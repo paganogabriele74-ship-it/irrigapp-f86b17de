@@ -75,7 +75,32 @@ const ProgramsList = () => {
     setPrograms(prev => prev.filter(x => x.id !== p.id));
   };
 
-  const filtered = programs.filter(p => p.name.toLowerCase().includes(q.toLowerCase()));
+  const uniqueTimes = useMemo(() => Array.from(new Set(programs.flatMap(p => p.program_times?.map(t => t.start_time) ?? []))).sort(), [programs]);
+  const uniqueDurations = useMemo(() => Array.from(new Set(programs.map(p => p.duration_minutes))).sort((a, b) => a - b), [programs]);
+
+  const filtered = programs.filter(p => {
+    if (q && !p.name.toLowerCase().includes(q.toLowerCase())) return false;
+    if (filterSector !== "all" && !p.sectors.includes(Number(filterSector))) return false;
+    if (filterTime !== "all" && !p.program_times?.some(t => t.start_time === filterTime)) return false;
+    if (filterDosage !== "all" && p.dosage !== filterDosage) return false;
+    if (filterDuration !== "all" && p.duration_minutes !== Number(filterDuration)) return false;
+    return true;
+  });
+
+  const activeFilterCount =
+    (q ? 1 : 0) +
+    (filterSector !== "all" ? 1 : 0) +
+    (filterTime !== "all" ? 1 : 0) +
+    (filterDosage !== "all" ? 1 : 0) +
+    (filterDuration !== "all" ? 1 : 0);
+
+  const clearFilters = () => {
+    setQ("");
+    setFilterSector("all");
+    setFilterTime("all");
+    setFilterDosage("all");
+    setFilterDuration("all");
+  };
 
   return (
     <AppShell>
