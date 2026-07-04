@@ -304,13 +304,13 @@ const Dashboard = () => {
             <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
               <SheetHeader className="text-left">
                 <SheetTitle className="flex items-center gap-2"><MapPin className="size-4" /> Ruvo di Puglia · Prossime 8 ore</SheetTitle>
-                <SheetDescription>Temperatura, probabilità pioggia e vento. Se il vento supera 20 km/h chiudere gli sportelli.</SheetDescription>
+                <SheetDescription>Temperatura, probabilità pioggia e vento. Se il vento supera i 30 km/h chiudere gli sportelli.</SheetDescription>
               </SheetHeader>
               <div className="mt-4 divide-y divide-border rounded-2xl border bg-card">
                 {weather?.hourly?.length ? weather.hourly.map((h, i) => {
                   const { Icon, label } = weatherInfo(h.code);
                   const hour = new Date(h.time).getHours();
-                  const windAlert = h.wind >= 20;
+                  const windAlert = h.wind >= 30;
                   return (
                     <div key={i} className="flex items-center gap-3 p-3">
                       <div className="w-12 text-sm font-extrabold tabular-nums text-primary">{pad(hour)}:00</div>
@@ -338,7 +338,7 @@ const Dashboard = () => {
                   <div className="p-6 text-center text-sm text-muted-foreground">Previsioni non disponibili</div>
                 )}
               </div>
-              {weather?.hourly?.some(h => h.wind >= 20) && (
+              {weather?.hourly?.some(h => h.wind >= 30) && (
                 <div className="mt-4 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 flex items-start gap-2">
                   <AlertTriangle className="size-5 text-destructive shrink-0 mt-0.5" />
                   <div className="text-sm">
@@ -351,7 +351,7 @@ const Dashboard = () => {
           </Sheet>
 
           {/* Allerta vento — sportelli */}
-          {weather && weather.wind >= 20 && (
+          {weather && weather.wind >= 30 && (
             <div className="relative mt-4 rounded-2xl bg-amber-500/25 border border-amber-200/50 p-3 flex items-center gap-3">
               <div className="size-10 rounded-xl bg-amber-400/40 flex items-center justify-center shrink-0">
                 <AlertTriangle className="size-5" />
