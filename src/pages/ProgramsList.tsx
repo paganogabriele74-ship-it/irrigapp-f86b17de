@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { SignedImage } from "@/components/SignedImage";
-import { Edit3, Trash2, Copy, Plus, Search, Droplets, Layers, Timer, Calendar, FileSpreadsheet } from "lucide-react";
+import { Edit3, Trash2, Copy, Plus, Search, Droplets, Layers, Timer, Calendar, FileSpreadsheet, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DAYS, DOSAGE_COLORS, DOSAGE_LABELS, formatSectors, Program } from "@/lib/irrigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DAYS, DOSAGE_COLORS, DOSAGE_LABELS, SECTORS, formatSectors, Program } from "@/lib/irrigation";
 import { findConflicts, exportProgramsToXlsx } from "@/lib/conflicts";
 import { ConflictBanner } from "@/components/ConflictBanner";
 import { toast } from "sonner";
@@ -20,6 +21,10 @@ const ProgramsList = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [filterSector, setFilterSector] = useState<string>("all");
+  const [filterTime, setFilterTime] = useState<string>("all");
+  const [filterDosage, setFilterDosage] = useState<string>("all");
+  const [filterDuration, setFilterDuration] = useState<string>("all");
 
   const load = async () => {
     setLoading(true);
@@ -70,7 +75,32 @@ const ProgramsList = () => {
     setPrograms(prev => prev.filter(x => x.id !== p.id));
   };
 
-  const filtered = programs.filter(p => p.name.toLowerCase().includes(q.toLowerCase()));
+  const uniqueTimes = useMemo(() => Array.from(new Set(programs.flatMap(p => p.program_times?.map(t => t.start_time) ?? []))).sort(), [programs]);
+  const uniqueDurations = useMemo(() => Array.from(new Set(programs.map(p => p.duration_minutes))).sort((a, b) => a - b), [programs]);
+
+  const filtered = programs.filter(p => {
+    if (q && !p.name.toLowerCase().includes(q.toLowerCase())) return false;
+    if (filterSector !== "all" && !p.sectors.includes(Number(filterSector))) return false;
+    if (filterTime !== "all" && !p.program_times?.some(t => t.start_time === filterTime)) return false;
+    if (filterDosage !== "all" && p.dosage !== filterDosage) return false;
+    if (filterDuration !== "all" && p.duration_minutes !== Number(filterDuration)) return false;
+    return true;
+  });
+
+  const activeFilterCount =
+    (q ? 1 : 0) +
+    (filterSector !== "all" ? 1 : 0) +
+    (filterTime !== "all" ? 1 : 0) +
+    (filterDosage !== "all" ? 1 : 0) +
+    (filterDuration !== "all" ? 1 : 0);
+
+  const clearFilters = () => {
+    setQ("");
+    setFilterSector("all");
+    setFilterTime("all");
+    setFilterDosage("all");
+    setFilterDuration("all");
+  };
 
   return (
     <AppShell>
@@ -99,9 +129,54 @@ const ProgramsList = () => {
 
       <ConflictBanner conflicts={findConflicts(programs)} />
 
-      <div className="relative mb-4">
+      <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input className="pl-9" placeholder="Cerca programma..." value={q} onChange={(e) => setQ(e.target.value)} />
+      </div>
+
+      <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 -mx-1 px-1">
+        <SlidersHorizontal className="size-4 text-muted-foreground shrink-0" />
+        <Select value={filterSector} onValueChange={setFilterSector}>
+          <SelectTrigger className="h-9 w-[140px] shrink-0">
+            <SelectValue placeholder="Settore" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tutti i settori</SelectItem>
+            {SECTORS.map(s => <SelectItem key={s} value={String(s)}>Settore {s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={filterTime} onValueChange={setFilterTime}>
+          <SelectTrigger className="h-9 w-[130px] shrink-0">
+            <SelectValue placeholder="Orario" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tutti gli orari</SelectItem>
+            {uniqueTimes.map(t => <SelectItem key={t} value={t}>{t.slice(0, 5)}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={filterDosage} onValueChange={setFilterDosage}>
+          <SelectTrigger className="h-9 w-[130px] shrink-0">
+            <SelectValue placeholder="Dosaggio" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tutti i dosaggi</SelectItem>
+            {Object.entries(DOSAGE_LABELS).map(([k, label]) => <SelectItem key={k} value={k}>{label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={filterDuration} onValueChange={setFilterDuration}>
+          <SelectTrigger className="h-9 w-[150px] shrink-0">
+            <SelectValue placeholder="Durata" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tutte le durate</SelectItem>
+            {uniqueDurations.map(d => <SelectItem key={d} value={String(d)}>{d} min/settore</SelectItem>)}
+          </SelectContent>
+        </Select>
+        {activeFilterCount > 0 && (
+          <Button type="button" variant="ghost" size="sm" className="h-9 px-2 shrink-0" onClick={clearFilters}>
+            <X className="size-4" /> Cancella
+          </Button>
+        )}
       </div>
 
       {loading ? (
@@ -110,9 +185,11 @@ const ProgramsList = () => {
         </div>
       ) : filtered.length === 0 ? (
         <Card className="p-10 text-center border-dashed">
-          <p className="text-muted-foreground mb-4">{programs.length === 0 ? "Nessun programma ancora." : "Nessun risultato."}</p>
-          {programs.length === 0 && (
+          <p className="text-muted-foreground mb-4">{programs.length === 0 ? "Nessun programma ancora." : "Nessun risultato per i filtri scelti."}</p>
+          {programs.length === 0 ? (
             <Button asChild><Link to="/programmi/nuovo"><Plus className="size-4" /> Crea il primo</Link></Button>
+          ) : activeFilterCount > 0 && (
+            <Button variant="outline" onClick={clearFilters}><X className="size-4" /> Cancella filtri</Button>
           )}
         </Card>
       ) : (
