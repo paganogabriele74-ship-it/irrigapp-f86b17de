@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { SignedImage } from "@/components/SignedImage";
-import { Edit3, Trash2, Copy, Plus, Search, Droplets, Layers, Timer, Calendar, FileSpreadsheet } from "lucide-react";
+import { Edit3, Trash2, Copy, Plus, Search, Droplets, Layers, Timer, Calendar, FileSpreadsheet, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DAYS, DOSAGE_COLORS, DOSAGE_LABELS, formatSectors, Program } from "@/lib/irrigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DAYS, DOSAGE_COLORS, DOSAGE_LABELS, SECTORS, formatSectors, Program, DosageType } from "@/lib/irrigation";
 import { findConflicts, exportProgramsToXlsx } from "@/lib/conflicts";
 import { ConflictBanner } from "@/components/ConflictBanner";
 import { toast } from "sonner";
