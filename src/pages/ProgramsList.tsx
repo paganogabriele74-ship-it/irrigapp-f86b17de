@@ -130,54 +130,74 @@ const ProgramsList = () => {
 
       <ConflictBanner conflicts={findConflicts(programs)} />
 
-      <div className="relative mb-3">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input className="pl-9" placeholder="Cerca programma..." value={q} onChange={(e) => setQ(e.target.value)} />
-      </div>
-
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 -mx-1 px-1">
-        <SlidersHorizontal className="size-4 text-muted-foreground shrink-0" />
-        <Select value={filterSector} onValueChange={setFilterSector}>
-          <SelectTrigger className="h-9 w-[140px] shrink-0">
-            <SelectValue placeholder="Settore" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tutti i settori</SelectItem>
-            {SECTORS.map(s => <SelectItem key={s} value={String(s)}>Settore {s}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={filterTime} onValueChange={setFilterTime}>
-          <SelectTrigger className="h-9 w-[130px] shrink-0">
-            <SelectValue placeholder="Orario" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tutti gli orari</SelectItem>
-            {uniqueTimes.map(t => <SelectItem key={t} value={t}>{t.slice(0, 5)}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={filterDosage} onValueChange={setFilterDosage}>
-          <SelectTrigger className="h-9 w-[130px] shrink-0">
-            <SelectValue placeholder="Dosaggio" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tutti i dosaggi</SelectItem>
-            {Object.entries(DOSAGE_LABELS).map(([k, label]) => <SelectItem key={k} value={k}>{label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={filterDuration} onValueChange={setFilterDuration}>
-          <SelectTrigger className="h-9 w-[150px] shrink-0">
-            <SelectValue placeholder="Durata" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tutte le durate</SelectItem>
-            {uniqueDurations.map(d => <SelectItem key={d} value={String(d)}>{d} min/settore</SelectItem>)}
-          </SelectContent>
-        </Select>
-        {activeFilterCount > 0 && (
-          <Button type="button" variant="ghost" size="sm" className="h-9 px-2 shrink-0" onClick={clearFilters}>
-            <X className="size-4" /> Cancella
-          </Button>
-        )}
+      <div className="flex items-center gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input className="pl-9 h-10" placeholder="Cerca programma..." value={q} onChange={(e) => setQ(e.target.value)} />
+        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5 h-10 shrink-0">
+              <SlidersHorizontal className="size-4" />
+              Filtra
+              {activeFilterCount > 0 && (
+                <span className="ml-0.5 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-72 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold">Filtri</p>
+              {activeFilterCount > 0 && (
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={clearFilters}>
+                  <X className="size-3" /> Azzera
+                </Button>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">Settore</label>
+              <Select value={filterSector} onValueChange={setFilterSector}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutti i settori</SelectItem>
+                  {SECTORS.map(s => <SelectItem key={s} value={String(s)}>Settore {s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">Orario</label>
+              <Select value={filterTime} onValueChange={setFilterTime}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutti gli orari</SelectItem>
+                  {uniqueTimes.map(t => <SelectItem key={t} value={t}>{t.slice(0, 5)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">Dosaggio</label>
+              <Select value={filterDosage} onValueChange={setFilterDosage}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutti i dosaggi</SelectItem>
+                  {Object.entries(DOSAGE_LABELS).map(([k, label]) => <SelectItem key={k} value={k}>{label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">Durata</label>
+              <Select value={filterDuration} onValueChange={setFilterDuration}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutte le durate</SelectItem>
+                  {uniqueDurations.map(d => <SelectItem key={d} value={String(d)}>{d} min/settore</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {loading ? (
