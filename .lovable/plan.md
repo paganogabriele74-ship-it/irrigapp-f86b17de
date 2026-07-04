@@ -15,6 +15,6 @@
 - Cambiare il testo dell'alert vento da generico a specifico:
   > "Allerta vento (X km/h) — chiudere gli sportelli"
 - Applicare la stessa dicitura anche nel Sheet delle previsioni orarie quando una fascia supera la soglia.
-- Soglia invariata (≥ 20 km/h).
+- Soglia: ≥ 30 km/h.
 
 Nessuna modifica a database, logica programmi o altre schermate.
