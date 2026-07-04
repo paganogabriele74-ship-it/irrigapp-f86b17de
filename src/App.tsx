@@ -9,6 +9,7 @@ import ProgramsList from "./pages/ProgramsList";
 import ProgramForm from "./pages/ProgramForm";
 import NotFound from "./pages/NotFound";
 import ProgramsGuard from "./components/ProgramsGuard";
+import AiAssistant from "./components/AiAssistant";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/programmi/:id" element={<ProgramsGuard><ProgramForm /></ProgramsGuard>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <AiAssistant />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
