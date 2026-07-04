@@ -10,7 +10,7 @@ import { SignedImage } from "@/components/SignedImage";
 import { Edit3, Trash2, Copy, Plus, Search, Droplets, Layers, Timer, Calendar, FileSpreadsheet, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DAYS, DOSAGE_COLORS, DOSAGE_LABELS, SECTORS, formatSectors, Program, DosageType } from "@/lib/irrigation";
+import { DAYS, DOSAGE_COLORS, DOSAGE_LABELS, SECTORS, formatSectors, Program } from "@/lib/irrigation";
 import { findConflicts, exportProgramsToXlsx } from "@/lib/conflicts";
 import { ConflictBanner } from "@/components/ConflictBanner";
 import { toast } from "sonner";
