@@ -351,7 +351,7 @@ const ProgramForm = () => {
 
           <div>
             <div className="flex items-baseline justify-between mb-2 gap-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Durata per settore</span>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{isFarfalla ? "Durata" : "Durata per settore"}</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground tabular-nums">Tot: {totalMinutes} min</span>
                 <CopyFrom
