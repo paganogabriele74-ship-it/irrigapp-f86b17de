@@ -78,10 +78,15 @@ const ProgramForm = () => {
   const { id } = useParams();
   const isEdit = id && id !== "nuovo";
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState("");
+  const [kind, setKind] = useState<"programma" | "farfalla">(
+    searchParams.get("tipo") === "farfalla" ? "farfalla" : "programma"
+  );
+  const isFarfalla = kind === "farfalla";
   const [dosage, setDosage] = useState<DosageType>("acqua");
   const [duration, setDuration] = useState<number>(15);
   const [days, setDays] = useState<number[]>([]);
