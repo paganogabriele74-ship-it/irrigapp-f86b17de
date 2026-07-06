@@ -214,72 +214,115 @@ const ProgramsList = () => {
           )}
         </Card>
       ) : (
-        <div className="space-y-3">
-          {filtered.map(p => (
-            <Card key={p.id} className={cn("overflow-hidden", !p.active && "opacity-70")}>
-              <div className="flex">
-                {p.image_url && (
-                  <div className="w-24 shrink-0 bg-muted">
-                    <SignedImage path={p.image_url} className="w-full h-full object-cover" />
-                  </div>
+        <div className="space-y-4">
+          {filtered.map(p => {
+            const daysLabel =
+              p.days_of_week.length === 0 ? "Nessun giorno" :
+              p.days_of_week.length === 7 ? "Tutti i giorni" :
+              [...p.days_of_week].sort().map(d => DAYS.find(x => x.id === d)?.short).join(" · ");
+            const times = (p.program_times ?? []).map(t => t.start_time.slice(0,5)).sort();
+            return (
+              <Card
+                key={p.id}
+                className={cn(
+                  "relative overflow-hidden border-0 shadow-sm ring-1 ring-border/60 rounded-2xl transition-all",
+                  !p.active && "opacity-70"
                 )}
-                <div className="flex-1 p-4 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-semibold truncate">{p.name}</h3>
-                    <Switch checked={p.active} onCheckedChange={() => toggleActive(p)} />
-                  </div>
+              >
+                {/* Accent bar colored by dosage */}
+                <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", DOSAGE_COLORS[p.dosage])} />
 
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    <Badge className={cn("border-0", DOSAGE_COLORS[p.dosage])}>
-                      <Droplets className="size-3 mr-1" />{DOSAGE_LABELS[p.dosage]}
-                    </Badge>
-                    <Badge variant="outline" className="font-normal">
-                      <Timer className="size-3 mr-1" />{p.duration_minutes} min
-                    </Badge>
-                    <Badge variant="outline" className="font-normal">
-                      <Layers className="size-3 mr-1" />Settori {formatSectors(p.sectors)}
-                    </Badge>
-                  </div>
+                <div className="flex">
+                  {p.image_url && (
+                    <div className="w-24 shrink-0 bg-muted hidden sm:block">
+                      <SignedImage path={p.image_url} className="w-full h-full object-cover" />
+                    </div>
+                  )}
 
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
-                    <Calendar className="size-3.5" />
-                    {p.days_of_week.length === 0 ? "Nessun giorno" :
-                     p.days_of_week.length === 7 ? "Tutti i giorni" :
-                     [...p.days_of_week].sort().map(d => DAYS.find(x => x.id === d)?.short).join(", ")}
-                    {p.program_times && p.program_times.length > 0 && (
-                      <span> · {p.program_times.length} {p.program_times.length === 1 ? "orario" : "orari"}</span>
+                  <div className="flex-1 p-4 pl-5 min-w-0">
+                    {/* 1. NOME */}
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-lg leading-tight truncate">{p.name}</h3>
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                          {p.active ? "Attivo" : "In pausa"}
+                        </p>
+                      </div>
+                      <Switch checked={p.active} onCheckedChange={() => toggleActive(p)} />
+                    </div>
+
+                    {/* 2. DOSAGGIO - hero badge */}
+                    <div className="mb-3">
+                      <Badge className={cn("border-0 text-sm py-1 px-3 gap-1.5 rounded-lg font-semibold", DOSAGE_COLORS[p.dosage])}>
+                        <Droplets className="size-3.5" />
+                        {DOSAGE_LABELS[p.dosage]}
+                      </Badge>
+                    </div>
+
+                    {/* 3-4. SETTORI + MIN/SETTORE grid */}
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div className="rounded-xl bg-muted/50 px-3 py-2">
+                        <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                          <Layers className="size-3" /> Settori
+                        </div>
+                        <div className="text-sm font-bold mt-0.5 truncate">{formatSectors(p.sectors)}</div>
+                      </div>
+                      <div className="rounded-xl bg-muted/50 px-3 py-2">
+                        <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                          <Timer className="size-3" /> Min / settore
+                        </div>
+                        <div className="text-sm font-bold mt-0.5">{p.duration_minutes} min</div>
+                      </div>
+                    </div>
+
+                    {/* 5. GIORNI */}
+                    <div className="flex items-center gap-2 text-xs mb-1.5">
+                      <Calendar className="size-3.5 text-muted-foreground shrink-0" />
+                      <span className="font-medium truncate">{daysLabel}</span>
+                    </div>
+
+                    {/* 6. ORARI */}
+                    {times.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {times.map(t => (
+                          <span key={t} className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
                     )}
-                  </div>
 
-                  <div className="flex flex-wrap gap-1.5">
-                    <Button size="sm" variant="outline" asChild>
-                      <Link to={`/programmi/${p.id}`}><Edit3 className="size-3.5" /> Modifica</Link>
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => duplicate(p)}>
-                      <Copy className="size-3.5" /> Duplica
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="text-destructive hover:text-destructive">
-                          <Trash2 className="size-3.5" /> Elimina
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Eliminare "{p.name}"?</AlertDialogTitle>
-                          <AlertDialogDescription>Questa azione non può essere annullata.</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Annulla</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => remove(p)} className="bg-destructive hover:bg-destructive/90">Elimina</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    {/* AZIONI */}
+                    <div className="flex flex-wrap gap-1.5 pt-2 border-t border-border/60 mt-2">
+                      <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" asChild>
+                        <Link to={`/programmi/${p.id}`}><Edit3 className="size-3.5" /> Modifica</Link>
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={() => duplicate(p)}>
+                        <Copy className="size-3.5" /> Duplica
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-destructive hover:text-destructive">
+                            <Trash2 className="size-3.5" /> Elimina
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Eliminare "{p.name}"?</AlertDialogTitle>
+                            <AlertDialogDescription>Questa azione non può essere annullata.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annulla</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => remove(p)} className="bg-destructive hover:bg-destructive/90">Elimina</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
     </AppShell>
