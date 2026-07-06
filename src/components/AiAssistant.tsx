@@ -144,8 +144,8 @@ export const AiAssistant = () => {
             </div>
           </div>
 
-
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+
             {messages.map((m, i) => (
               <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
                 <div
