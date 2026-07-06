@@ -262,7 +262,10 @@ const ProgramForm = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="size-5" />
         </Button>
-        <h1 className="text-lg font-bold flex-1 truncate">{isEdit ? "Modifica" : "Nuovo programma"}</h1>
+        <h1 className="text-lg font-bold flex-1 truncate flex items-center gap-2">
+          {isFarfalla && <span>🦋</span>}
+          {isEdit ? (isFarfalla ? "Modifica farfalla" : "Modifica") : (isFarfalla ? "Nuova farfalla" : "Nuovo programma")}
+        </h1>
         <Button onClick={save} disabled={saving} size="sm">
           <Save className="size-4" />
           {saving ? "..." : "Salva"}
