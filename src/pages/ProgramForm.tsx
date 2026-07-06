@@ -390,6 +390,7 @@ const ProgramForm = () => {
             </div>
           </div>
 
+          {!isFarfalla && (
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori:</div>
