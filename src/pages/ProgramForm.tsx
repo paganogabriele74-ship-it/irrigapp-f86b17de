@@ -171,7 +171,7 @@ const ProgramForm = () => {
     const parsed = schema.safeParse({ name, duration });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     if (days.length === 0) return toast.error("Seleziona almeno un giorno");
-    if (sectors.length === 0) return toast.error("Seleziona almeno un settore");
+    if (!isFarfalla && sectors.length === 0) return toast.error("Seleziona almeno un settore");
     if (times.length === 0) return toast.error("Aggiungi almeno un orario");
 
     setSaving(true);
@@ -190,16 +190,17 @@ const ProgramForm = () => {
       finalImagePath = path;
     }
 
-    const payload = {
+    const payload: any = {
       name: parsed.data.name,
-      dosage,
+      dosage: isFarfalla ? "acqua" : dosage,
       duration_minutes: parsed.data.duration,
-      sectors,
+      sectors: isFarfalla ? [] : sectors,
       days_of_week: days,
       active,
       image_url: finalImagePath,
       week_pattern: weekPattern,
       sector_mode: sectorMode,
+      kind,
     };
 
     let programId = id!;
