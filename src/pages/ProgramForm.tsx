@@ -347,6 +347,7 @@ const ProgramForm = () => {
               })}
             </div>
           </div>
+          )}
 
           <div>
             <div className="flex items-baseline justify-between mb-2 gap-2">
