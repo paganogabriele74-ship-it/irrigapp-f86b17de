@@ -122,9 +122,27 @@ const ProgramsList = () => {
           >
             <FileSpreadsheet className="size-4" /> Esporta
           </Button>
-          <Button asChild>
-            <Link to="/programmi/nuovo"><Plus className="size-4" /> Nuovo</Link>
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button><Plus className="size-4" /> Nuovo</Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-52 p-1">
+              <Link to="/programmi/nuovo" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent">
+                <span className="text-lg">💧</span>
+                <div>
+                  <div className="text-sm font-semibold">Programma</div>
+                  <div className="text-[11px] text-muted-foreground">Con settori</div>
+                </div>
+              </Link>
+              <Link to="/programmi/nuovo?tipo=farfalla" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent">
+                <span className="text-lg">🦋</span>
+                <div>
+                  <div className="text-sm font-semibold">Farfalle</div>
+                  <div className="text-[11px] text-muted-foreground">Solo acqua, senza settori</div>
+                </div>
+              </Link>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
