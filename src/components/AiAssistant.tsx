@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
-import logoIcon from "@/assets/verde-bella-bot-icon.png.asset.json";
+import logoIcon from "@/assets/verde-bella-bot-mascot.png.asset.json";
 
 
 type Msg = { role: "user" | "assistant"; content: string };
