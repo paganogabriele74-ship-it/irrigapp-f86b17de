@@ -8,8 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 import logoIcon from "@/assets/verde-bella-bot-mascot.png.asset.json";
 
-
 type Msg = { role: "user" | "assistant"; content: string };
+
 
 export const AiAssistant = () => {
   const [open, setOpen] = useState(false);
@@ -124,8 +124,8 @@ export const AiAssistant = () => {
         )}
       </button>
 
-
       {/* Panel */}
+
       {open && (
         <div
           className={cn(
