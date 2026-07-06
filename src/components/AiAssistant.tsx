@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, Send, X, Loader2 } from "lucide-react";
+import { Send, X, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
+import logoIcon from "@/assets/verde-bella-bot-mascot.png.asset.json";
 
 type Msg = { role: "user" | "assistant"; content: string };
+
 
 export const AiAssistant = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: "Ciao! Sono il tuo assistente per l'irrigazione. Chiedimi come strutturare un programma o informazioni sui settori." },
+    { role: "assistant", content: "Ciao! Sono Verde Bella Bot, il tuo assistente per l'irrigazione. Chiedimi come strutturare un programma o informazioni sui settori." },
   ]);
+
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -106,18 +109,23 @@ export const AiAssistant = () => {
       {/* Floating button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Assistente AI"
+        aria-label="Verde Bella Bot"
         className={cn(
           "fixed z-50 right-4 bottom-24 md:bottom-6 size-14 rounded-full shadow-lg",
-          "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground",
+          "bg-white border-2 border-primary text-primary",
           "flex items-center justify-center transition-transform hover:scale-105 active:scale-95",
-          "ring-4 ring-primary/20"
+          "ring-4 ring-primary/20 overflow-hidden"
         )}
       >
-        {open ? <X className="size-6" /> : <Bot className="size-7" />}
+        {open ? (
+          <X className="size-6 text-primary" />
+        ) : (
+          <img src={logoIcon.url} alt="Verde Bella Bot" className="size-12 object-cover rounded-full" />
+        )}
       </button>
 
       {/* Panel */}
+
       {open && (
         <div
           className={cn(
@@ -127,16 +135,17 @@ export const AiAssistant = () => {
           )}
         >
           <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2">
-            <div className="size-8 rounded-full bg-primary/15 text-primary flex items-center justify-center">
-              <Bot className="size-4" />
+            <div className="size-8 rounded-full bg-white border border-primary/20 flex items-center justify-center overflow-hidden">
+              <img src={logoIcon.url} alt="Verde Bella Bot" className="size-8 object-cover rounded-full" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold">Assistente irrigazione</div>
-              <div className="text-xs text-muted-foreground">Chiedimi dei programmi</div>
+              <div className="text-sm font-semibold">Verde Bella Bot</div>
+              <div className="text-xs text-muted-foreground">Il tuo assistente irrigazione</div>
             </div>
           </div>
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+
             {messages.map((m, i) => (
               <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
                 <div
