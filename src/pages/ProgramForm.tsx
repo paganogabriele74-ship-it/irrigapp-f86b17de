@@ -115,6 +115,7 @@ const ProgramForm = () => {
         return;
       }
       setName(data.name);
+      setKind((((data as any).kind ?? "programma") === "farfalla" ? "farfalla" : "programma"));
       setDosage(data.dosage as DosageType);
       setDuration(data.duration_minutes);
       setDays(data.days_of_week);
