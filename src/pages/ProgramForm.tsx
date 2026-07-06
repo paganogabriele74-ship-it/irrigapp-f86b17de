@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -78,10 +78,15 @@ const ProgramForm = () => {
   const { id } = useParams();
   const isEdit = id && id !== "nuovo";
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState("");
+  const [kind, setKind] = useState<"programma" | "farfalla">(
+    searchParams.get("tipo") === "farfalla" ? "farfalla" : "programma"
+  );
+  const isFarfalla = kind === "farfalla";
   const [dosage, setDosage] = useState<DosageType>("acqua");
   const [duration, setDuration] = useState<number>(15);
   const [days, setDays] = useState<number[]>([]);
@@ -110,6 +115,7 @@ const ProgramForm = () => {
         return;
       }
       setName(data.name);
+      setKind((((data as any).kind ?? "programma") === "farfalla" ? "farfalla" : "programma"));
       setDosage(data.dosage as DosageType);
       setDuration(data.duration_minutes);
       setDays(data.days_of_week);
@@ -165,7 +171,7 @@ const ProgramForm = () => {
     const parsed = schema.safeParse({ name, duration });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     if (days.length === 0) return toast.error("Seleziona almeno un giorno");
-    if (sectors.length === 0) return toast.error("Seleziona almeno un settore");
+    if (!isFarfalla && sectors.length === 0) return toast.error("Seleziona almeno un settore");
     if (times.length === 0) return toast.error("Aggiungi almeno un orario");
 
     setSaving(true);
@@ -184,16 +190,17 @@ const ProgramForm = () => {
       finalImagePath = path;
     }
 
-    const payload = {
+    const payload: any = {
       name: parsed.data.name,
-      dosage,
+      dosage: isFarfalla ? "acqua" : dosage,
       duration_minutes: parsed.data.duration,
-      sectors,
+      sectors: isFarfalla ? [] : sectors,
       days_of_week: days,
       active,
       image_url: finalImagePath,
       week_pattern: weekPattern,
       sector_mode: sectorMode,
+      kind,
     };
 
     let programId = id!;
@@ -234,7 +241,7 @@ const ProgramForm = () => {
     return <AppShell><div className="h-96 animate-pulse rounded-2xl bg-muted" /></AppShell>;
   }
 
-  const totalMinutes = sectorMode === "sequential" ? duration * Math.max(1, sectors.length) : duration;
+  const totalMinutes = isFarfalla ? duration : (sectorMode === "sequential" ? duration * Math.max(1, sectors.length) : duration);
 
   // Compact pill button helper styles
   const pill = (sel: boolean) => cn(
@@ -255,7 +262,10 @@ const ProgramForm = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="size-5" />
         </Button>
-        <h1 className="text-lg font-bold flex-1 truncate">{isEdit ? "Modifica" : "Nuovo programma"}</h1>
+        <h1 className="text-lg font-bold flex-1 truncate flex items-center gap-2">
+          {isFarfalla && <span>🦋</span>}
+          {isEdit ? (isFarfalla ? "Modifica farfalla" : "Modifica") : (isFarfalla ? "Nuova farfalla" : "Nuovo programma")}
+        </h1>
         <Button onClick={save} disabled={saving} size="sm">
           <Save className="size-4" />
           {saving ? "..." : "Salva"}
@@ -310,6 +320,7 @@ const ProgramForm = () => {
 
         {/* Dosage as colored pills + duration stepper */}
         <Card className="p-4 space-y-4">
+          {!isFarfalla && (
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Dosaggio</div>
@@ -336,10 +347,11 @@ const ProgramForm = () => {
               })}
             </div>
           </div>
+          )}
 
           <div>
             <div className="flex items-baseline justify-between mb-2 gap-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Durata per settore</span>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{isFarfalla ? "Durata" : "Durata per settore"}</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground tabular-nums">Tot: {totalMinutes} min</span>
                 <CopyFrom
@@ -378,6 +390,7 @@ const ProgramForm = () => {
             </div>
           </div>
 
+          {!isFarfalla && (
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori:</div>
@@ -393,6 +406,7 @@ const ProgramForm = () => {
               <button type="button" onClick={() => setSectorMode("sequential")} className={cn("py-2.5", pill(sectorMode === "sequential"))}>Uno alla volta</button>
             </div>
           </div>
+          )}
         </Card>
 
         {/* Days + week pattern combined */}
@@ -477,6 +491,7 @@ const ProgramForm = () => {
         </Card>
 
         {/* Sectors - compact grid */}
+        {!isFarfalla && (
         <Card className="p-4 space-y-2">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori</div>
@@ -511,6 +526,7 @@ const ProgramForm = () => {
             })}
           </div>
         </Card>
+        )}
 
         {/* Delete (only edit) */}
         {isEdit && (

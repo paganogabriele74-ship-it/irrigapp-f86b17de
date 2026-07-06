@@ -122,9 +122,27 @@ const ProgramsList = () => {
           >
             <FileSpreadsheet className="size-4" /> Esporta
           </Button>
-          <Button asChild>
-            <Link to="/programmi/nuovo"><Plus className="size-4" /> Nuovo</Link>
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button><Plus className="size-4" /> Nuovo</Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-52 p-1">
+              <Link to="/programmi/nuovo" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent">
+                <span className="text-lg">💧</span>
+                <div>
+                  <div className="text-sm font-semibold">Programma</div>
+                  <div className="text-[11px] text-muted-foreground">Con settori</div>
+                </div>
+              </Link>
+              <Link to="/programmi/nuovo?tipo=farfalla" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent">
+                <span className="text-lg">🦋</span>
+                <div>
+                  <div className="text-sm font-semibold">Farfalle</div>
+                  <div className="text-[11px] text-muted-foreground">Solo acqua, senza settori</div>
+                </div>
+              </Link>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -243,9 +261,12 @@ const ProgramsList = () => {
                     {/* 1. NOME */}
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="min-w-0">
-                        <h3 className="font-bold text-lg leading-tight truncate">{p.name}</h3>
+                        <h3 className="font-bold text-lg leading-tight truncate flex items-center gap-1.5">
+                          {(p as any).kind === "farfalla" && <span title="Farfalla">🦋</span>}
+                          <span className="truncate">{p.name}</span>
+                        </h3>
                         <p className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">
-                          {p.active ? "Attivo" : "In pausa"}
+                          {(p as any).kind === "farfalla" ? "Farfalla · " : ""}{p.active ? "Attivo" : "In pausa"}
                         </p>
                       </div>
                       <Switch checked={p.active} onCheckedChange={() => toggleActive(p)} />
@@ -260,16 +281,18 @@ const ProgramsList = () => {
                     </div>
 
                     {/* 3-4. SETTORI + MIN/SETTORE grid */}
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      <div className="rounded-xl bg-muted/50 px-3 py-2">
-                        <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                          <Layers className="size-3" /> Settori
+                    <div className={cn("grid gap-2 mb-3", (p as any).kind === "farfalla" ? "grid-cols-1" : "grid-cols-2")}>
+                      {(p as any).kind !== "farfalla" && (
+                        <div className="rounded-xl bg-muted/50 px-3 py-2">
+                          <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                            <Layers className="size-3" /> Settori
+                          </div>
+                          <div className="text-sm font-bold mt-0.5 truncate">{formatSectors(p.sectors)}</div>
                         </div>
-                        <div className="text-sm font-bold mt-0.5 truncate">{formatSectors(p.sectors)}</div>
-                      </div>
+                      )}
                       <div className="rounded-xl bg-muted/50 px-3 py-2">
                         <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                          <Timer className="size-3" /> Min / settore
+                          <Timer className="size-3" /> {(p as any).kind === "farfalla" ? "Durata" : "Min / settore"}
                         </div>
                         <div className="text-sm font-bold mt-0.5">{p.duration_minutes} min</div>
                       </div>

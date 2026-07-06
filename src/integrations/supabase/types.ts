@@ -73,6 +73,7 @@ export type Database = {
           duration_minutes: number
           id: string
           image_url: string | null
+          kind: string
           name: string
           sector_mode: string
           sectors: number[]
@@ -88,6 +89,7 @@ export type Database = {
           duration_minutes: number
           id?: string
           image_url?: string | null
+          kind?: string
           name: string
           sector_mode?: string
           sectors?: number[]
@@ -103,6 +105,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           image_url?: string | null
+          kind?: string
           name?: string
           sector_mode?: string
           sectors?: number[]
