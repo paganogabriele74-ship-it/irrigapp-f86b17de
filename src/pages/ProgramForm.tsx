@@ -241,7 +241,7 @@ const ProgramForm = () => {
     return <AppShell><div className="h-96 animate-pulse rounded-2xl bg-muted" /></AppShell>;
   }
 
-  const totalMinutes = sectorMode === "sequential" ? duration * Math.max(1, sectors.length) : duration;
+  const totalMinutes = isFarfalla ? duration : (sectorMode === "sequential" ? duration * Math.max(1, sectors.length) : duration);
 
   // Compact pill button helper styles
   const pill = (sel: boolean) => cn(
