@@ -406,6 +406,7 @@ const ProgramForm = () => {
               <button type="button" onClick={() => setSectorMode("sequential")} className={cn("py-2.5", pill(sectorMode === "sequential"))}>Uno alla volta</button>
             </div>
           </div>
+          )}
         </Card>
 
         {/* Days + week pattern combined */}
