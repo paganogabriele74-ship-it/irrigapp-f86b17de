@@ -120,7 +120,7 @@ export const AiAssistant = () => {
         {open ? (
           <X className="size-6 text-primary" />
         ) : (
-          <img src={logoIcon.url} alt="Verde Bella Bot" className="size-12 object-contain rounded-full" />
+          <img src={logoIcon.url} alt="Verde Bella Bot" className="size-12 object-cover rounded-full" />
         )}
       </button>
 
@@ -136,7 +136,7 @@ export const AiAssistant = () => {
         >
           <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-2">
             <div className="size-8 rounded-full bg-white border border-primary/20 flex items-center justify-center overflow-hidden">
-              <img src={logoIcon.url} alt="Verde Bella Bot" className="size-6 object-contain rounded-full" />
+              <img src={logoIcon.url} alt="Verde Bella Bot" className="size-8 object-cover rounded-full" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold">Verde Bella Bot</div>
