@@ -526,6 +526,7 @@ const ProgramForm = () => {
             })}
           </div>
         </Card>
+        )}
 
         {/* Delete (only edit) */}
         {isEdit && (
