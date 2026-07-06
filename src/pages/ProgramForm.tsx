@@ -491,6 +491,7 @@ const ProgramForm = () => {
         </Card>
 
         {/* Sectors - compact grid */}
+        {!isFarfalla && (
         <Card className="p-4 space-y-2">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settori</div>
