@@ -326,9 +326,13 @@ const ProgramsList = () => {
 
                     {/* 6. ORARI */}
                     {times.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-3">
+                      <div className="flex flex-wrap gap-1.5 mb-3">
                         {times.map(t => (
-                          <span key={t} className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary">
+                          <span
+                            key={t}
+                            className="inline-flex items-center gap-1 text-sm font-mono font-bold px-2.5 py-1 rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm tabular-nums tracking-tight"
+                          >
+                            <Clock className="size-3.5 opacity-90" />
                             {t}
                           </span>
                         ))}
