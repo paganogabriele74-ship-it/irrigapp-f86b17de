@@ -129,18 +129,36 @@ const DaysView = () => {
         </Card>
       ) : (
         <div className="space-y-3">
-          {slots.map((slot, i) => (
-            <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex gap-3">
-              <div className="w-16 shrink-0 pt-3">
-                <div className="text-lg font-bold tabular-nums">{formatTime(slot.time)}</div>
+          {slots.map((slot, i) => {
+            const isToday = selected === today && selectedWeek === currentWeek;
+            const p: any = slot.program;
+            const totalMin = p.kind === "farfalla"
+              ? p.duration_minutes
+              : p.sector_mode === "sequential"
+                ? p.duration_minutes * (p.sectors?.length || 1)
+                : p.duration_minutes;
+            const [hh, mm] = slot.time.split(":").map(Number);
+            const now = new Date();
+            const startMin = hh * 60 + mm;
+            const nowMin = now.getHours() * 60 + now.getMinutes();
+            const isLive = isToday && nowMin >= startMin && nowMin < startMin + totalMin;
+            return (
+              <div key={`${slot.program.id}-${slot.time}-${i}`} className="flex gap-3">
+                <div className="w-16 shrink-0 pt-3">
+                  <div className={cn("text-lg font-bold tabular-nums", isLive && "text-primary")}>{formatTime(slot.time)}</div>
+                </div>
+                <div className={cn(
+                  "flex-1 rounded-2xl transition-base",
+                  isLive && "ring-2 ring-primary shadow-glow animate-pulse-slow"
+                )}>
+                  <ProgramCard program={slot.program} compact readonly />
+                </div>
               </div>
-              <div className="flex-1">
-                <ProgramCard program={slot.program} compact readonly />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
+
 
       {/* Prev/Next quick nav */}
       <div className="flex justify-between mt-6">
