@@ -54,14 +54,18 @@ const DaysView = () => {
               onClick={() => setSelectedWeek(w)}
               className={cn(
                 "py-2.5 rounded-lg text-sm font-semibold transition-base flex items-center justify-center gap-2",
-                sel ? "gradient-primary text-primary-foreground shadow-soft" : "text-secondary-foreground hover:bg-background/50"
+                sel
+                  ? w === "A"
+                    ? "bg-fertilizer text-fertilizer-foreground shadow-soft"
+                    : "bg-acid text-acid-foreground shadow-soft"
+                  : "text-secondary-foreground hover:bg-background/50"
               )}
             >
               {w === "A" ? "Settimana concime" : "Settimana acido"}
               {isCurrent && (
                 <span className={cn(
                   "text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase",
-                  sel ? "bg-primary-foreground/20" : "bg-primary text-primary-foreground"
+                  sel ? "bg-background/25" : "bg-primary text-primary-foreground"
                 )}>Ora</span>
               )}
             </button>

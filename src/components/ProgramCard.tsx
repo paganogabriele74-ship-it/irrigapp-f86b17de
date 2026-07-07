@@ -41,7 +41,12 @@ export const ProgramCard = ({ program, highlightTime, compact, readonly }: Props
                 )}>{program.name}</h3>
                 {!program.active && <span className="text-xs text-muted-foreground">Disattivato</span>}
                 {program.week_pattern && program.week_pattern !== "every" && (
-                  <span className="ml-1 inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent text-accent-foreground align-middle">
+                  <span className={cn(
+                    "ml-1 inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded align-middle",
+                    program.week_pattern === "A"
+                      ? "bg-fertilizer text-fertilizer-foreground"
+                      : "bg-acid text-acid-foreground"
+                  )}>
                     Sett. {program.week_pattern === "A" ? "concime" : "acido"}
                   </span>
                 )}
