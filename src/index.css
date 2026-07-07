@@ -35,9 +35,9 @@
     /* Dosaggio: acqua / concime / acido */
     --water: 200 90% 38%;
     --water-foreground: 0 0% 100%;
-    --fertilizer: 30 85% 50%;
+    --fertilizer: 0 75% 50%;
     --fertilizer-foreground: 0 0% 100%;
-    --acid: 350 70% 52%;
+    --acid: 75 70% 45%;
     --acid-foreground: 0 0% 100%;
 
     --destructive: 0 75% 55%;
@@ -89,10 +89,10 @@
     --accent-foreground: 0 0% 100%;
     --water: 195 90% 50%;
     --water-foreground: 0 0% 100%;
-    --fertilizer: 30 85% 60%;
-    --fertilizer-foreground: 0 0% 10%;
-    --acid: 350 70% 60%;
-    --acid-foreground: 0 0% 100%;
+    --fertilizer: 0 75% 55%;
+    --fertilizer-foreground: 0 0% 100%;
+    --acid: 75 65% 50%;
+    --acid-foreground: 0 0% 10%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
     --border: 205 25% 20%;
