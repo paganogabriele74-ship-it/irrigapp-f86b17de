@@ -15,8 +15,14 @@ const DaysView = () => {
   const selected = day ? Number(day) : today;
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const [, setTick] = useState(0);
   const currentWeek = getCurrentWeekLetter();
   const [selectedWeek, setSelectedWeek] = useState<"A" | "B">(currentWeek);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 30000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     (async () => {
